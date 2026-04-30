@@ -1,0 +1,7 @@
+Unmapped department values (not found in DEPT_MAP)
+==================================================
+These values were encountered in the dataset but have no
+entry in the explicit normalization table.
+Please add them to DEPT_MAP in GIS/dept_housing.py.
+
+  (none — all raw values are covered by the explicit map)

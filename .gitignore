@@ -1,0 +1,15 @@
+# ProQuest export — licensed data, not redistributable
+extended-annotated.csv
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Pipeline log files — generated on each run
+GIS/processed/dept_overrides_log.txt
+GIS/processed/fill_departments_log.txt
+
+# Temporary / lock files
+~$*.xlsx
+~$*.pptx
