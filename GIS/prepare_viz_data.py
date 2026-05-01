@@ -936,12 +936,14 @@ DEPT_TIMELINE = {
         {"from": 1963, "to": 9999, "building": "Crown Family School of Social Work, Policy, and Practice"},
     ],
     "Public Policy Studies": [
-        # Harris School founded 1988; Keller Center is the home building.
-        {"from": 0,    "to": 9999, "building": "Keller Center"},
+        # Harris School founded 1988; pre-Harris Planning records (1955–1976) → Cobb Hall.
+        {"from": 0,    "to": 1987, "building": "Cobb Hall"},
+        {"from": 1988, "to": 9999, "building": "Keller Center"},
     ],
     "Business": [
-        # Booth School of Business traces roots to 1898; current building (2004).
-        {"from": 0,    "to": 9999, "building": "Booth School of Business"},
+        # GSB founded 1898 in Rosenwald Hall era; Booth building opened 2004.
+        {"from": 0,    "to": 2003, "building": "Rosenwald Hall"},
+        {"from": 2004, "to": 9999, "building": "Booth School of Business"},
     ],
 
     # ── HOME ECONOMICS / HOUSEHOLD ADMINISTRATION (dissolved 1956) ─────────

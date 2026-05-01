@@ -935,6 +935,64 @@ DEPT_MAP = {
     "Social Thought and English Language and Literature": "Social Thought",
     "Social":                                      "UNKNOWN",
     "Psychology and Conceptual and Historical Studies of Science": "Psychology",
+
+    # --- Convocation historical joint & committee entries (1923–2009 cleaned data) --------
+    # All-caps strings with '&' separator from convocation program digitization.
+    # Joint entries follow R10: primary (first-listed) department is used.
+    "ANTHROPOLOGY & LINGUISTICS":                              "Anthropology",
+    "ANTHROPOLOGY & HISTORY":                                  "Anthropology",
+    "ANTHROPOLOGY & ART HISTORY":                              "Anthropology",
+    "LINGUISTICS & ANTHROPOLOGY":                              "Linguistics",
+    "LINGUISTICS & PSYCHOLOGY":                                "Linguistics",
+    "LINGUISTICS & PHILOSOPHY":                                "Linguistics",
+    "LINGUISTICS & NEAR EASTERN LANGUAGES AND CIVILIZATIONS":  "Linguistics",
+    "LINGUISTICS & COMPARATIVE STUDIES IN LITERATURE":         "Linguistics",
+    "SLAVIC LANGUAGES AND LITERATURES & LINGUISTICS":          "Slavic Languages and Literatures",
+    "SOCIAL THOUGHT & COMPARATIVE LITERATURE":                 "Social Thought",
+    "SOCIAL THOUGHT & PSYCHOLOGY":                             "Social Thought",
+    "SOCIAL THOUGHT & PHILOSOPHY":                             "Social Thought",
+    "SOCIAL THOUGHT & DIVINITY SCHOOL":                        "Social Thought",
+    "SOCIALTHOUGHT & LINGUISTICS":                             "Social Thought",    # typo in source
+    "SOCIAL THOUGHT & GERMANIC LANGUAGES AND LITERATURES":     "Social Thought",
+    "SOCIAL THOUGHT & POLITICAL SCIENCE":                      "Social Thought",
+    "SOCIAL THOUGHT & CLASSICAL LANGUAGES AND LITERATURES":    "Social Thought",
+    "SOCIAL THOUGHT & ENGLISH LANGUAGE AND LITERATURE":        "Social Thought",
+    "SOCIAL THOUGHT & ART HISTORY":                            "Social Thought",
+    "PSYCHOLOGY & LINGUISTICS":                                "Psychology",
+    "PSYCHOLOGY & CONCEPTUAL AND HISTORICAL STUDIES OF SCIENCE": "Psychology",
+    "HISTORY & ECONOMICS":                                     "History",
+    "HISTORY & SOCIAL THOUGHT":                                "History",
+    "JEWISH STUDIES & HISTORY":                                "Jewish Studies",
+    "NEAR EASTERN LANGUAGES AND CIVILIZATIONS & LINGUISTICS":  "Near Eastern Languages and Civilizations",
+    "EAST ASIAN LANGUAGES AND CIVILIZATIONS & CINEMA AND MEDIA STUDIES": "East Asian Languages and Civilizations",
+    "SOUTH ASIAN LANGUAGES AND CIVILIZATIONS & HISTORY":       "South Asian Languages and Civilizations",
+    "COMPUTER SCIENCE & MATHEMATICS":                          "Computer Science",
+    "CHEMISTRY & ASTRONOMY AND ASTROPHYSICS":                  "Chemistry",
+    "EDUCATION & SOCIOLOGY":                                   "Education",
+
+    # Committee-named programs — mapped to their departmental home
+    "COMMITTEE ON MEDICAL PHYSICS":          "Physics",                              # PSD, Kersten
+    "COMMITTEE ON CANCER BIOLOGY":           "Biochemistry and Molecular Biology",   # BSD/GCIS cluster
+    "COMMITTEE ON NEUROBIOLOGY":             "Organismal Biology and Anatomy",       # BSD, Culver Hall
+    "COMMITTEE ON CINEMA AND MEDIA STUDIES": "Cinema and Media Studies",
+
+    # Behavioral Sciences / Psychology subdiscipline tracks
+    "BEHAVIORAL SCIENCES: RESEARCH METHODOLOGY AND QUANTITATIVE PSYCHOLOGY":              "Psychology",
+    "BEHAVIORAL SCIENCES: COMMITTEE ON RESEARCH METHODOLOGY AND QUANTITATIVE PSYCHOLOGY": "Psychology",
+    "BEHAVIORAL SCIENCES: COMMITTEE ON COGNITION AND COMMUNICATION":                      "Psychology",
+    "PSYCHOLOGY: HUMAN DEVELOPMENT AND MENTAL HEALTH RESEARCH":    "Comparative Human Development",
+    "PSYCHOLOGY: BIOPSYCHOLOGY AND MENTAL HEALTH RESEARCH":        "Psychology",
+    "PSYCHOLOGY: DEVELOPMENTAL PSYCHOLOGY AND MENTAL HEALTH RESEARCH": "Comparative Human Development",
+    "PSYCHOLOGY: COMMITTEE ON HUMAN DEVELOPMENT":                  "Comparative Human Development",
+    "HUMAN DEVELOPMENT AND MENTAL HEALTH RESEARCH":                "Comparative Human Development",
+    "DEVELOPMENTAL PSYCHOLOGY AND MENTAL HEALTH RESEARCH":         "Comparative Human Development",
+
+    # Other historical programs
+    "MINISTRY STUDIES":    "Divinity",                      # Divinity School ministerial track
+    "SURGERY (OPHTHALMOLOGY)": "Organismal Biology and Anatomy",   # BSD clinical, Culver Hall
+    "PHYSIOLOGY: MATHEMATICAL BIOPHYSICS": "Organismal Biology and Anatomy",   # Physiology → OBA
+    "LAW SCHOOL":          "UNKNOWN",                       # no spatial entry for Law School
+    "GEOGRAPHY AND PROGRAM OF EDUCATION RESEARCH IN PLANNING": "UNKNOWN",   # Geography dept dissolved 1986
 }
 
 
