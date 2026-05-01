@@ -159,7 +159,7 @@ The `.xlsx` reader in `fill_departments.py` uses `zipfile` + stdlib XML parsing 
 **Fully reproducible** given the input files. The pipeline is deterministic:
 - No random seeds needed (TF-IDF + cosine similarity are deterministic; TSP uses a fixed starting point)
 - All normalization decisions are in explicit lookup tables (`DEPT_MAP` in `dept_housing.py`, `COUNTRY_NORMALIZE` in `prepare_viz_data.py`)
-- All judgment calls are documented inline in the source files and in `vis/departments.html`
+- All judgment calls are documented inline in the source files and in the Dept Histories tab of the visualization
 
 **The one non-redistributable input** is `extended-annotated.csv` (ProQuest license). A collaborator with institutional ProQuest TDM Studio access can re-export the same query (University of Chicago, all years, all fields). The other four input files are in this repository.
 
@@ -173,12 +173,6 @@ python3 GIS/geo_ripper.py
 python3 GIS/prepare_viz_data.py
 # Open vis/index.html in a browser
 ```
-
----
-
-## Department reference
-
-`vis/departments.html` — standalone reference page for all 44 canonical departments: historical names, building timelines with sources, judgment call documentation. Also accessible via the Dept Histories tab in the visualization.
 
 ---
 
@@ -205,7 +199,6 @@ python3 GIS/prepare_viz_data.py
 │       └── unmapped_departments.txt            # Audit log (should be empty)
 └── vis/
     ├── index.html                  # Interactive visualization (4 tabs)
-    ├── departments.html            # Department reference page
     ├── vis_data.js                 # Campus + similarity + global data (generated)
     ├── world_data.js               # World GeoJSON (generated)
     └── diss_index.js               # Dissertation explorer index (generated)
