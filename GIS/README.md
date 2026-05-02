@@ -2,7 +2,7 @@
 
 Interactive GIS visualization of 32,013 University of Chicago dissertations — campus choropleth, global research focus, keyword similarity, and department histories.
 
-McGallian Data Visualization Fellowship 2025
+Data Visualization Fellowship 2025-2026
 
 ---
 

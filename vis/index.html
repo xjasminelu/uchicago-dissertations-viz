@@ -488,6 +488,7 @@
     <button class="tab-btn"        onclick="switchTab('global')">Global Research Focus</button>
     <button class="tab-btn"        onclick="switchTab('ring')">Keyword Similarity</button>
     <button class="tab-btn"        onclick="switchTab('depts')">Dept Histories</button>
+    <button class="tab-btn"        onclick="switchTab('download')" style="margin-left:auto;">⬇ Download Data</button>
   </div>
 
   <!-- ================================================================ -->
@@ -980,6 +981,103 @@
     </div>
   </div>
 
+  <!-- ================================================================ -->
+  <!-- TAB 5 — Download Data                                            -->
+  <!-- ================================================================ -->
+  <div id="tab-download" class="tab-panel" style="flex-direction:column;overflow-y:auto;background:#fafaf8;">
+    <div style="max-width:820px;margin:0 auto;padding:32px 28px 48px;">
+
+      <h2 style="font-size:1.25rem;color:#800000;font-weight:700;margin-bottom:4px;">
+        Cleaned Dissertation Dataset
+      </h2>
+      <p style="color:#555;font-size:.88rem;margin-bottom:20px;line-height:1.6;">
+        32,013 University of Chicago dissertation records (1893–2025), cleaned and enriched with
+        canonical department names, historical campus building assignments, and geographic research focus.
+        Produced by the Data Visualization Fellowship 2025-2026.
+      </p>
+
+      <!-- Stats row -->
+      <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:130px;background:#fff;border:1px solid #e0d8d0;border-radius:6px;padding:14px 16px;text-align:center;">
+          <div style="font-size:1.6rem;font-weight:700;color:#800000;">32,013</div>
+          <div style="font-size:.78rem;color:#666;margin-top:2px;">dissertation records</div>
+        </div>
+        <div style="flex:1;min-width:130px;background:#fff;border:1px solid #e0d8d0;border-radius:6px;padding:14px 16px;text-align:center;">
+          <div style="font-size:1.6rem;font-weight:700;color:#800000;">15</div>
+          <div style="font-size:.78rem;color:#666;margin-top:2px;">columns</div>
+        </div>
+        <div style="flex:1;min-width:130px;background:#fff;border:1px solid #e0d8d0;border-radius:6px;padding:14px 16px;text-align:center;">
+          <div style="font-size:1.6rem;font-weight:700;color:#800000;">96.9%</div>
+          <div style="font-size:.78rem;color:#666;margin-top:2px;">dept coverage</div>
+        </div>
+        <div style="flex:1;min-width:130px;background:#fff;border:1px solid #e0d8d0;border-radius:6px;padding:14px 16px;text-align:center;">
+          <div style="font-size:1.6rem;font-weight:700;color:#800000;">4,068</div>
+          <div style="font-size:.78rem;color:#666;margin-top:2px;">geo-enriched records</div>
+        </div>
+      </div>
+
+      <!-- Download button -->
+      <a href="data_download.zip" download
+         style="display:inline-block;background:#800000;color:#fff;font-weight:700;
+                font-size:.95rem;padding:12px 28px;border-radius:5px;text-decoration:none;
+                margin-bottom:10px;letter-spacing:.02em;">
+        &#11015; Download ZIP (CSV + README + License)
+      </a>
+      <p style="color:#888;font-size:.8rem;margin-bottom:28px;">
+        Includes: <code>dissertations_clean_share.csv</code> &middot; <code>DATA_README.md</code> &middot; <code>LICENSE.txt</code>
+      </p>
+
+      <!-- Column table -->
+      <h3 style="font-size:.95rem;color:#800000;font-weight:700;margin-bottom:8px;">Columns</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:.82rem;margin-bottom:28px;">
+        <thead>
+          <tr style="background:#800000;color:#fff;">
+            <th style="padding:7px 10px;text-align:left;font-weight:600;white-space:nowrap;">Column</th>
+            <th style="padding:7px 10px;text-align:left;font-weight:600;">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#fdf8f5;"><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">goid</td><td style="padding:6px 10px;color:#444;">ProQuest unique ID</td></tr>
+          <tr><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">title</td><td style="padding:6px 10px;color:#444;">Dissertation title</td></tr>
+          <tr style="background:#fdf8f5;"><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">date</td><td style="padding:6px 10px;color:#444;">Year of completion (4-digit)</td></tr>
+          <tr><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">authors</td><td style="padding:6px 10px;color:#444;">Author(s)</td></tr>
+          <tr style="background:#fdf8f5;"><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">advisors</td><td style="padding:6px 10px;color:#444;">Advisor(s)</td></tr>
+          <tr><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">committee_members</td><td style="padding:6px 10px;color:#444;">Committee members</td></tr>
+          <tr style="background:#fdf8f5;"><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">degree</td><td style="padding:6px 10px;color:#444;">Degree type (e.g. PhD)</td></tr>
+          <tr><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">dept_raw</td><td style="padding:6px 10px;color:#444;">Original department string from whichever source filled it</td></tr>
+          <tr style="background:#fdf8f5;"><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">dept_modern</td><td style="padding:6px 10px;color:#444;">Normalized canonical department (44 values + UNKNOWN)</td></tr>
+          <tr><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">campus_building</td><td style="padding:6px 10px;color:#444;">Building assigned via historical routing — where the dept was at time of writing</td></tr>
+          <tr style="background:#fdf8f5;"><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">keywords_author</td><td style="padding:6px 10px;color:#444;">Author-assigned keywords (ProQuest)</td></tr>
+          <tr><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">subject_terms</td><td style="padding:6px 10px;color:#444;">ProQuest controlled vocabulary subject terms</td></tr>
+          <tr style="background:#fdf8f5;"><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">class_terms</td><td style="padding:6px 10px;color:#444;">ProQuest classification terms</td></tr>
+          <tr><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">geo_entities</td><td style="padding:6px 10px;color:#444;">Semicolon-separated countries detected via NER (12.7% of records)</td></tr>
+          <tr style="background:#fdf8f5;"><td style="padding:6px 10px;font-family:monospace;color:#800000;white-space:nowrap;">geo_primary</td><td style="padding:6px 10px;color:#444;">Primary detected geographic focus country</td></tr>
+        </tbody>
+      </table>
+
+      <!-- License & provenance -->
+      <div style="background:#fff;border:1px solid #e0d8d0;border-radius:6px;padding:16px 18px;font-size:.82rem;color:#555;line-height:1.65;">
+        <strong style="color:#800000;">License</strong><br>
+        Released under
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:#800000;">
+          Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.
+        Free to share and adapt for any purpose with attribution.<br><br>
+        <strong style="color:#800000;">Data Provenance</strong><br>
+        Dissertation metadata originates from ProQuest TDM Studio, UChicago convocation programs
+        (1932–2009), and HathiTrust digitized catalog (1893–1931).
+        Enriched fields (<code>dept_modern</code>, <code>campus_building</code>,
+        <code>geo_entities</code>, <code>geo_primary</code>) are original contributions of this project.<br><br>
+        <strong style="color:#800000;">Citation</strong><br>
+        Jasmine Lu, Andrew McGallian, Khushi Desai.
+        <em>Visualizing University of Chicago Dissertation Topics (1893–2025)</em>.
+        Data Visualization Fellowship, 2025-2026.
+        <a href="https://github.com/xjasminelu/uchicago-dissertations-viz" target="_blank" style="color:#800000;">
+          github.com/xjasminelu/uchicago-dissertations-viz</a>
+      </div>
+
+    </div>
+  </div>
+
 </div><!-- #app -->
 
 <script>
@@ -1123,7 +1221,7 @@ function escHtml(s) {
 // Tab switching
 // ==========================================================================
 
-const TABS = ["campus", "global", "ring", "depts"];
+const TABS = ["campus", "global", "ring", "depts", "download"];
 let tabInited = {};
 
 function switchTab(name) {
