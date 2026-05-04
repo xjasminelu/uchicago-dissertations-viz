@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>UChicago Dissertations — Spatial Explorer</title>
+  <title>UChicago Dissertations — Explorer</title>
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -33,12 +33,16 @@
     header {
       background: #800000;
       color: #fff;
-      padding: 14px 24px;
+      padding: 7px 24px;
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 16px;
       flex-shrink: 0;
+      justify-content: space-between;
     }
+    .header-title { display: flex; align-items: baseline; gap: 16px; }
+    .header-logo img { height: 75px; display: block; opacity: .92; }
+    .header-logo:hover img { opacity: 1; }
     header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: .02em; }
     header p  { font-size: .8rem; opacity: .75; }
 
@@ -63,6 +67,7 @@
     }
     .tab-btn:hover  { color: #fff; }
     .tab-btn.active { color: #fff; border-bottom-color: #c0392b; }
+    .tab-btn.placeholder { opacity: .38; font-style: italic; cursor: default; pointer-events: none; }
 
     /* ------------------------------------------------------------------ */
     /* Layout shell                                                         */
@@ -70,6 +75,31 @@
     #app { display: flex; flex-direction: column; height: 100vh; }
     .tab-panel { display: none; flex: 1; overflow: hidden; }
     .tab-panel.active { display: flex; }
+
+    .about-panel { flex-direction: column; overflow-y: auto; background: #fafaf8; }
+    .about-wrap { max-width: 740px; margin: 0 auto; padding: 40px 30px 64px; }
+    .about-wrap h1 { font-size: 1.45rem; font-weight: 700; color: #2a211b; margin-bottom: 6px; }
+    .about-wrap .about-byline { font-size: .82rem; color: #800000; font-weight: 600; margin-bottom: 18px; }
+    .about-wrap p { font-size: .9rem; color: #444; line-height: 1.7; margin-bottom: 14px; }
+    .about-stats {
+      display: flex; gap: 0; flex-wrap: wrap;
+      margin: 20px 0 28px;
+      padding: 16px 0;
+      border-top: 1px solid #e0d8d0;
+      border-bottom: 1px solid #e0d8d0;
+      justify-content: space-around;
+    }
+    .about-stats > div { text-align: center; flex: 1; min-width: 110px; }
+    .about-stats .stat-n { font-size: 1.5rem; font-weight: 800; color: #800000; line-height: 1.1; }
+    .about-stats .stat-l { font-size: .75rem; color: #666; margin-top: 3px; }
+    .about-wrap h3 {
+      font-size: .8rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .08em; color: #800000; margin: 28px 0 10px;
+    }
+    .about-wrap ul { padding-left: 18px; margin-bottom: 14px; }
+    .about-wrap li { font-size: .88rem; color: #444; line-height: 1.65; margin-bottom: 4px; }
+    .about-wrap li strong { color: #2a211b; font-weight: 600; }
+    @media (max-width: 600px) { .about-wrap { padding: 24px 18px 40px; } }
 
     /* Map + sidebar split */
     .map-layout { display: flex; width: 100%; height: 100%; }
@@ -476,25 +506,181 @@
   <!-- Header                                                            -->
   <!-- ================================================================ -->
   <header>
-    <h1>University of Chicago — Dissertation Spatial Explorer</h1>
-    <p>1893–2025 &nbsp;·&nbsp; 32,013 dissertations</p>
+    <div class="header-title">
+      <h1>University of Chicago — Dissertation Explorer</h1>
+      <p>1893–2025</p>
+    </div>
+    <a href="https://www.lib.uchicago.edu/research/scholar/" target="_blank" class="header-logo" title="UChicago Center for Digital Scholarship">
+      <img src="../assets/UChicago_LIB_CDS_Horizontal_White RGB.svg" alt="UChicago Center for Digital Scholarship">
+    </a>
   </header>
 
   <!-- ================================================================ -->
   <!-- Tab bar                                                           -->
   <!-- ================================================================ -->
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('campus')">Campus Choropleth</button>
+    <button class="tab-btn active" onclick="switchTab('about')">About</button>
+    <button class="tab-btn"        onclick="switchTab('campus')">Campus Choropleth</button>
     <button class="tab-btn"        onclick="switchTab('global')">Global Research Focus</button>
     <button class="tab-btn"        onclick="switchTab('ring')">Keyword Similarity</button>
+    <button class="tab-btn placeholder">Network Analysis</button>
     <button class="tab-btn"        onclick="switchTab('depts')">Dept Histories</button>
+    <button class="tab-btn placeholder">Advisors &amp; Committee</button>
+    <button class="tab-btn placeholder">Dissertation Explorer</button>
+    <button class="tab-btn placeholder">ORCID &amp; Post-Graduation</button>
     <button class="tab-btn"        onclick="switchTab('download')" style="margin-left:auto;">⬇ Download Data</button>
   </div>
 
   <!-- ================================================================ -->
-  <!-- TAB 1 — Campus Choropleth                                        -->
+  <!-- TAB 1 — About / Home                                             -->
   <!-- ================================================================ -->
-  <div id="tab-campus" class="tab-panel active">
+  <div id="tab-about" class="tab-panel active about-panel">
+    <div class="about-wrap">
+      <h1>Visualizing 130+ years of UChicago Dissertation Work</h1>
+      <div class="about-byline">Data Visualization Fellowship 2025–2026 &nbsp;·&nbsp; Jasmine Lu &nbsp;·&nbsp; Andrew McGallian &nbsp;·&nbsp; Khushi Desai</div>
+
+      <p>
+        The University of Chicago has kept a dissertation archive going back to 1893. This project
+        uses that archive to explore three questions: how
+        have dissertation topics and departmental activity shifted over time; how have the
+        geographic research interests of UChicago scholars moved across the world; and what do
+        advisor and committee relationships reveal about how knowledge and academic lineage are
+        structured here. The approach combines spatial analysis at the campus and global scales,
+        NLP on keywords and subject terms, and network analysis on departments, advisors, and
+        dissertation topics.
+      </p>
+      <p>
+        The goal is to translate a large institutional dataset into an interactive portrait of
+        academic knowledge production—one that can support institutional reflection, serve as
+        a reference for prospective faculty and students, and offer a lens on how the definition
+        of "PhD-worthy" research has shifted in response to national priorities, technological
+        change, and the emergence of new fields.
+      </p>
+
+      <h3>Data sources</h3>
+      <p>
+        <strong>ProQuest TDM Studio</strong> is the foundation with a full export of all 32,013
+        UChicago dissertation records, 1893–2025, flagged for PhD dissertations. Each record
+        includes title, date, authors, advisors, committee members, subject terms, and paper
+        keywords. The department field is only populated for records filed after 2009. Earlier
+        records also suffer from missing fields, inconsistent use of keywords and descriptions,
+        duplicate or citation-only entries, and occasional mistagging (records filed under the
+        wrong institution or degree type).
+      </p>
+      <p>
+        <strong>UChicago Convocation Programs (1932–2009)</strong> fill most of the department
+        gap for pre-2009 records. The programs list PhD graduates by school/division and, most
+        of the time, department. Compiling 22,993 records from fall, winter, spring, and summer
+        convocations across 77 years required manual review and cross-referencing dissertation
+        titles and author names. Limitations include typos, inconsistent department naming
+        conventions across eras, incomplete or ill-preserved program images, and cases where
+        a dissertation does not appear in any convocation record.
+      </p>
+      <p>
+        <strong>HathiTrust Digitized Catalog (1893–1931)</strong> covers the earliest era that
+        convocation programs do not reach. The source is a set of OCR-processed catalog documents
+        organized by division and department, parsed with a custom script. Limitations include
+        OCR errors from the digitization, inconsistent document formatting across years, and
+        name changes (marriage name changes in particular) that complicate matching to ProQuest
+        records.
+      </p>
+      <p>
+        <strong>UChicago Heritage Map</strong> provides the campus building geometry with polygon
+        footprints for university-owned buildings with historical metadata including year built.
+        This is the source for all campus-level spatial analysis. The main limitation is that the
+        map does not record which departments occupied which buildings over time; that routing
+        was reconstructed manually from cited department histories, facilities records, and
+        library exhibits.
+      </p>
+
+      <h3>Cleaning and normalization</h3>
+      <p>
+        The department field alone required substantial normalization work. Across all three
+        sources, more than 300 unique raw department strings appear — historical names,
+        abbreviations, all-caps convocation format, committee names, division-level labels, and
+        renames that accumulated over 130 years. All of these are mapped to 44 canonical modern
+        departments in an explicit lookup table, with historical names preserved in the
+        department-history cards. Records that cannot be reliably assigned a canonical department
+        are marked UNKNOWN rather than forced into a misleading category.
+      </p>
+      <p>
+        Matching ProQuest records to convocation programs uses title + year as the primary key,
+        with a 40-character prefix fallback and author surname as a last resort. Only unambiguous
+        single matches are accepted. Once a canonical department is assigned, each dissertation
+        is routed to the building that department actually occupied at the time of completion,
+        using a year-keyed building history for each of the 44 departments.
+      </p>
+      <p>
+        Geographic research focus is extracted by running spaCy NER (en_core_web_lg) over
+        dissertation titles, paper keywords, and subject terms — no abstracts were available.
+        A 200+ entry normalization table handles historical states (USSR → Russia, Ottoman Empire
+        → Turkey), ancient entities (Babylonia → Iraq), city-to-country mapping (London →
+        United Kingdom, Beijing → China), and modifier stripping (Ancient Egypt → Egypt).
+        Keyword similarity across departments is computed with TF-IDF vectorization and pairwise
+        cosine similarity, producing a 44×44 similarity matrix used by the ring diagram and
+        network views.
+      </p>
+      <p>
+        Establishing the building history for each of the 44 departments was its own research
+        effort, separate from the data cleaning work. The Heritage Map supplies building polygons
+        but does not record which departments occupied which buildings or when, so each
+        department's physical history had to be reconstructed from scratch. Primary sources
+        included department websites with "Our History" or "About" pages, university directories,
+        library exhibits, facilities records, and archived administrative pages. The range of
+        difficulty varied widely: some departments have well-maintained written histories;
+        others — particularly discontinued programs like the Graduate Library School (1926–1989)
+        and Home Economics (1918–1956), or departments with multiple relocations like Astronomy
+        and Astrophysics (Ryerson → Astronomy and Astrophysics Center → Eckhardt Research Center)
+        and Economics (SSRB → Saieh Hall)—required piecing together sources that weren't
+        written with this question in mind. Historical department names were tracked alongside
+        building timelines, so the same research that produced the routing table also produced
+        the historical names, notes, and source citations visible in the department cards in the
+        Dept Histories tab.
+      </p>
+
+      <h3>The dataset</h3>
+      <p>
+        The pipeline produces a shareable 15-column CSV with
+        canonical department names, historical campus building assignments, and geographic
+        entities. The pipeline is fully deterministic and all normalization
+        decisions live in explicit lookup tables in the source code, making the output
+        reproducible from the raw inputs.
+      </p>
+      <div class="about-stats">
+        <div><div class="stat-n">32,013</div><div class="stat-l">dissertation records</div></div>
+        <div><div class="stat-n">132</div><div class="stat-l">years of coverage</div></div>
+        <div><div class="stat-n">44</div><div class="stat-l">canonical departments</div></div>
+        <div><div class="stat-n">96.9%</div><div class="stat-l">dept + building coverage</div></div>
+        <div><div class="stat-n">4,068</div><div class="stat-l">geo-enriched records</div></div>
+      </div>
+
+      <h3>Features</h3>
+      <ul>
+        <li><strong>Campus Choropleth —</strong> building polygons colored by dissertation count, with a year slider and animated playback. Departments are routed to their actual building at each point in time. Click any building to explore its dissertations.</li>
+        <li><strong>Global Research Focus —</strong> countries shaded by mention count in dissertation titles, keywords, and subject terms. Decade toggle and a line chart trace how global research interests have shifted.</li>
+        <li><strong>Keyword Similarity —</strong> a ring of all 44 departments arranged in clockwise campus order, with chord edges scored by TF-IDF cosine similarity. The layout is conceptually inspired by ring species: adjacent departments share vocabulary the way neighboring species share genes. Includes a force-directed network, distance vs. similarity scatter, and a time series of mean pairwise similarity by year.</li>
+        <li><strong>Network Analysis —</strong> clustering departments, keywords, advisors, and committee members to surface interdisciplinary connections across the dataset. <em>In development.</em></li>
+        <li><strong>Department Histories —</strong> a Gantt chart of all 44 departments colored by academic division, with sourced building timelines and detailed department cards including historical names, addresses, and citations.</li>
+        <li><strong>Advisors &amp; Committee —</strong> testing whether a small number of advisors produce a disproportionate share of PhDs (a "Matthew Effect"), visualized as a Sankey diagram faceted by department. <em>In development.</em></li>
+        <li><strong>Dissertation Explorer —</strong> search by author name, keyword, or topic content with filtering by year and department. <em>In development.</em></li>
+        <li><strong>ORCID &amp; Post-Graduation —</strong> where do graduates go after UChicago? How much do they publish? What academic placements do they take? <em>In development.</em></li>
+        <li><strong>Download Data —</strong> the cleaned CSV, README, license, and citation guidance.</li>
+      </ul>
+
+      <h3>Known limits</h3>
+      <ul>
+        <li><strong>No abstracts —</strong> the ProQuest export did not include abstracts, so all topical and geographic analysis relies on titles, paper keywords, class terms, and subject terms. Coverage is real but partial — a dissertation on medieval France whose title gives no geographic signal will not appear in the global map.</li>
+        <li><strong>Historical departments are messy —</strong> names change, committees become departments, programs are dissolved or folded into others, and some records list only a division. All of those decisions are documented in the Dept Histories tab.</li>
+        <li><strong>Building history is evidence-based —</strong> locations are routed using cited sources, but where records are sparse or sources conflict, judgment calls were made and are noted.</li>
+        <li><strong>Some early records cannot be placed —</strong> bureaucratic changes, incomplete convocation programs, and OCR errors in HathiTrust mean a portion of pre-1932 records remain UNKNOWN on department and building.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- TAB 2 — Campus Choropleth                                        -->
+  <!-- ================================================================ -->
+  <div id="tab-campus" class="tab-panel">
     <div class="map-layout">
 
       <div class="sidebar">
@@ -551,7 +737,8 @@
             <div>
               <strong style="color:#800000;display:block;margin-bottom:4px;">Department assignment — three-source pipeline</strong>
               <p style="margin:0 0 6px;">
-                30,662 of 32,013 records (95.8%) carry a mapped modern department.
+                31,019 of 32,013 records (96.9%) carry a mapped modern department
+                and campus building geometry.
                 Departments were assigned from three sources, applied in priority order:
               </p>
               <ol style="margin:0 0 6px 16px;padding:0;">
@@ -587,7 +774,7 @@
                 </li>
               </ol>
               <p style="margin:0;background:#fffdf0;border-left:2px solid #e8a000;padding:4px 6px;">
-                <strong style="color:#7a4e00;">Remaining unknowns (1,351 records, 4.2%):</strong>
+                <strong style="color:#7a4e00;">Remaining unknowns (994 records, 3.1%):</strong>
                 Primarily records where no supplementary source matched, or where the source listed
                 only a division (e.g., "Division of Social Sciences") too broad to assign to a specific department.
                 The Graduate Library School (141 records, 1926–1989) is mapped to Harper Memorial Library
@@ -620,7 +807,7 @@
   </div>
 
   <!-- ================================================================ -->
-  <!-- TAB 2 — Global Research Focus                                    -->
+  <!-- TAB 3 — Global Research Focus                                    -->
   <!-- ================================================================ -->
   <div id="tab-global" class="tab-panel">
     <div class="map-layout">
@@ -717,7 +904,7 @@
   </div>
 
   <!-- ================================================================ -->
-  <!-- TAB 3 — Keyword Similarity                                       -->
+  <!-- TAB 4 — Keyword Similarity                                       -->
   <!-- ================================================================ -->
   <div id="tab-ring" class="tab-panel">
     <div class="chart-layout">
@@ -812,6 +999,7 @@
         <div id="ring-scatter-wrap" class="chart-wrap" style="display:none;height:420px;">
           <canvas id="ring-scatter"></canvas>
         </div>
+        <div id="ring-scatter-stats" style="display:none;font-size:.73rem;text-align:center;margin:-2px 0 6px;"></div>
         <!-- Time-series view (hidden by default) -->
         <div id="ring-timeseries-wrap" class="chart-wrap" style="display:none;height:420px;">
           <canvas id="ring-timeseries"></canvas>
@@ -921,7 +1109,7 @@
 
           <div style="border-left:3px solid #2d7a4f;padding-left:10px;">
             <strong style="display:block;margin-bottom:3px;">Data provenance</strong>
-            <strong>30,662 / 32,013 records (95.8%)</strong> carry a mapped department, filled from three
+            <strong>31,019 / 32,013 records (96.9%)</strong> carry a mapped department and building geometry, filled from three
             sources: ProQuest (6,310 direct), UChicago Convocation Programs 1932–2009 (~22,993 matched
             by title+year), and HathiTrust Digitized Catalog 1893–1931 (~2,617, with author+year fallback).
             Some individual years remain too sparse to build a yearly keyword matrix; those years
@@ -951,7 +1139,7 @@
   </div>
 
   <!-- ================================================================ -->
-  <!-- TAB 4 — Department Histories                                    -->
+  <!-- TAB 5 — Department Histories                                    -->
   <!-- ================================================================ -->
   <div id="tab-depts" class="tab-panel" style="flex-direction:column;overflow:hidden;">
 
@@ -966,6 +1154,33 @@
             oninput="filterDeptGantt()" />
           <div style="display:flex;gap:4px;flex-wrap:wrap;" id="depts-div-filters"></div>
         </div>
+        <details class="info-section" style="margin:0 8px 12px 0;">
+          <summary>Methods &amp; Sources</summary>
+          <div style="font-size:.72rem;color:#444;line-height:1.65;margin-top:6px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
+            <div style="background:#fff;border-left:3px solid #800000;padding:8px 10px;">
+              <strong style="color:#800000;display:block;margin-bottom:3px;">What the bars mean</strong>
+              Each bar segment is a department-building occupancy span from <code>DEPT_HISTORY</code>.
+              The bars are not clipped to dissertation volume; sparse years do not shrink the historical
+              housing span. Dissolved units end at their documented active end.
+            </div>
+            <div style="background:#fff;border-left:3px solid #2e6b9e;padding:8px 10px;">
+              <strong style="color:#2e6b9e;display:block;margin-bottom:3px;">What the cards add</strong>
+              Clicking a department opens addresses, dissertation counts, historical names,
+              notes/context, and row-level citations for every building move.
+            </div>
+            <div style="background:#fff;border-left:3px solid #2d7a4f;padding:8px 10px;">
+              <strong style="color:#2d7a4f;display:block;margin-bottom:3px;">Source policy</strong>
+              Top department links point to current or historical department pages. Building-history
+              citations support department location, founding, relocation, or continued occupancy claims.
+            </div>
+            <div style="background:#fff;border-left:3px solid #c08000;padding:8px 10px;">
+              <strong style="color:#8a5a00;display:block;margin-bottom:3px;">Pipeline connection</strong>
+              The same building spans are mirrored in <code>GIS/prepare_viz_data.py</code> for historical
+              campus routing. GeoJSON aliases handle cases like Walker Hall/Walker Museum and the
+              Astronomy and Astrophysics Center/WERC site.
+            </div>
+          </div>
+        </details>
         <svg id="depts-gantt-svg" style="display:block;"></svg>
       </div>
 
@@ -982,7 +1197,7 @@
   </div>
 
   <!-- ================================================================ -->
-  <!-- TAB 5 — Download Data                                            -->
+  <!-- TAB 6 — Download Data                                            -->
   <!-- ================================================================ -->
   <div id="tab-download" class="tab-panel" style="flex-direction:column;overflow-y:auto;background:#fafaf8;">
     <div style="max-width:820px;margin:0 auto;padding:32px 28px 48px;">
@@ -1026,6 +1241,35 @@
       <p style="color:#888;font-size:.8rem;margin-bottom:28px;">
         Includes: <code>dissertations_clean_share.csv</code> &middot; <code>DATA_README.md</code> &middot; <code>LICENSE.txt</code>
       </p>
+
+      <details class="info-section" style="margin-bottom:24px;background:#fff;border:1px solid #e0d8d0;border-radius:6px;padding:12px 14px;">
+        <summary>Dataset Methods &amp; Reproducibility</summary>
+        <div style="font-size:.8rem;color:#444;line-height:1.7;margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
+          <div>
+            <strong style="color:#800000;display:block;margin-bottom:4px;">Source assembly</strong>
+            ProQuest supplies the base metadata. Convocation programs fill most 1932–2009 department
+            gaps, and HathiTrust catalog records fill much of 1893–1931. Matching uses title+year first,
+            then conservative prefix or author/year fallback when needed.
+          </div>
+          <div>
+            <strong style="color:#800000;display:block;margin-bottom:4px;">Cleaning choices</strong>
+            Raw department strings are preserved, then normalized into 44 canonical departments.
+            Ambiguous division-only records stay <code>UNKNOWN</code> rather than being forced into a
+            misleading department.
+          </div>
+          <div>
+            <strong style="color:#800000;display:block;margin-bottom:4px;">Enriched fields</strong>
+            <code>campus_building</code> comes from historical department-building routing.
+            <code>geo_entities</code> and <code>geo_primary</code> come from spaCy NER plus country
+            normalization. Keyword fields are retained for independent analysis.
+          </div>
+          <div>
+            <strong style="color:#800000;display:block;margin-bottom:4px;">Reproducibility</strong>
+            The pipeline is deterministic: normalization tables, building spans, country aliases, and
+            visualization outputs are all explicit in the repository rather than inferred at runtime.
+          </div>
+        </div>
+      </details>
 
       <!-- Column table -->
       <h3 style="font-size:.95rem;color:#800000;font-weight:700;margin-bottom:8px;">Columns</h3>
@@ -1221,17 +1465,21 @@ function escHtml(s) {
 // Tab switching
 // ==========================================================================
 
-const TABS = ["campus", "global", "ring", "depts", "download"];
+const TABS = ["about", "campus", "global", "ring", "depts", "download"];
+// placeholder tabs (network, advisors, explorer, orcid) have no panel — skip in switchTab
 let tabInited = {};
 
 function switchTab(name) {
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
   document.getElementById(`tab-${name}`).classList.add("active");
-  event.target.classList.add("active");
+  const activeBtn = window.event?.target || [...document.querySelectorAll(".tab-btn")]
+    .find(b => b.getAttribute("onclick") && b.getAttribute("onclick").includes(`'${name}'`));
+  activeBtn && activeBtn.classList.add("active");
   // lazy init
   if (!tabInited[name]) {
     tabInited[name] = true;
+    if (name === "campus")          initCampusMap();
     if (name === "global")          initGlobalMap();
     if (name === "ring")            initRingSpecies();
     if (name === "depts")           initDeptHistory();
@@ -1243,7 +1491,7 @@ function switchTab(name) {
 }
 
 // ==========================================================================
-// TAB 1 — Campus Choropleth
+// TAB 2 — Campus Choropleth
 // ==========================================================================
 
 let campusMap, campusLayers = {};
@@ -1569,7 +1817,7 @@ function togglePlay() {
 }
 
 // ==========================================================================
-// TAB 2 — Global Map
+// TAB 3 — Global Map
 // ==========================================================================
 
 let globalMap, worldLayer;
@@ -1835,7 +2083,7 @@ function buildCurrentCentroidByDept() {
 
 
 // ==========================================================================
-// TAB 3 — Keyword Similarity
+// TAB 4 — Keyword Similarity
 // ==========================================================================
 
 let ringScatterChart;
@@ -1989,6 +2237,43 @@ function setActiveRingPeriod(year) {
   return _ringPeriodData;
 }
 
+function computePearsonAndRegression(points) {
+  const n = points.length;
+  if (n < 2) return null;
+  let sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0;
+  for (const p of points) { sx += p.x; sy += p.y; sxx += p.x*p.x; syy += p.y*p.y; sxy += p.x*p.y; }
+  const mx = sx / n, my = sy / n;
+  const dsx  = sxx - n * mx * mx;
+  const dsy  = syy - n * my * my;
+  const dsxy = sxy - n * mx * my;
+  const r = (dsx > 0 && dsy > 0) ? dsxy / Math.sqrt(dsx * dsy) : 0;
+  const slope = dsx > 0 ? dsxy / dsx : 0;
+  const intercept = my - slope * mx;
+  const xMin = Math.min(...points.map(p => p.x));
+  const xMax = Math.max(...points.map(p => p.x));
+  return { r, slope, intercept, xMin, xMax, n };
+}
+
+function updateScatterStats(points) {
+  const statsEl = document.getElementById("ring-scatter-stats");
+  if (!statsEl) return;
+  const stats = computePearsonAndRegression(points);
+  if (!stats) { statsEl.textContent = ""; return; }
+
+  if (ringScatterChart && ringScatterChart.data.datasets[1]) {
+    ringScatterChart.data.datasets[1].data = [
+      { x: stats.xMin, y: stats.slope * stats.xMin + stats.intercept },
+      { x: stats.xMax, y: stats.slope * stats.xMax + stats.intercept },
+    ];
+  }
+
+  const direction = stats.r < -0.05 ? " — nearer depts share more vocabulary" :
+                    stats.r >  0.05 ? " — farther depts share more vocabulary" : "";
+  statsEl.innerHTML =
+    `<strong>Pearson <em>r</em> = ${stats.r.toFixed(3)}</strong>` +
+    `<span style="color:#888;"> (${stats.n} pairs)${direction}</span>`;
+}
+
 function updateRingScatter(year) {
   if (!ringScatterChart) return;
   const rs = VIS_DATA.ringSpecies;
@@ -1999,6 +2284,7 @@ function updateRingScatter(year) {
     const c2 = getDivisionColor(p.d2);
     return c1 === c2 ? c1 + "99" : "#99999966";
   });
+  updateScatterStats(points);
   ringScatterChart.update("none");
 }
 
@@ -2025,6 +2311,25 @@ function updateCampusPixelPositions() {
     if (!latlon) continue;
     const pt = ringCampusMap.latLngToContainerPoint(L.latLng(latlon[0], latlon[1]));
     _campusPixelPos[dept] = [pt.x * scaleX, pt.y * scaleY];
+  }
+
+  // Spread co-located departments so they don't stack on the same pixel.
+  // Group by a ~6px bucket; any group with 2+ depts gets a small radial spread.
+  const BUCKET = 6, JITTER_R = 13;
+  const buckets = {};
+  for (const [dept, [px, py]] of Object.entries(_campusPixelPos)) {
+    const key = `${Math.round(px / BUCKET)},${Math.round(py / BUCKET)}`;
+    if (!buckets[key]) buckets[key] = [];
+    buckets[key].push(dept);
+  }
+  for (const members of Object.values(buckets)) {
+    if (members.length < 2) continue;
+    members.sort();
+    members.forEach((dept, i) => {
+      const angle = (2 * Math.PI * i) / members.length;
+      const [px, py] = _campusPixelPos[dept];
+      _campusPixelPos[dept] = [px + JITTER_R * Math.cos(angle), py + JITTER_R * Math.sin(angle)];
+    });
   }
 }
 
@@ -2259,13 +2564,28 @@ function initRingSpecies() {
   ringScatterChart = new Chart(document.getElementById("ring-scatter"), {
     type: "scatter",
     data: {
-      datasets: [{
-        label: "Department pair",
-        data: scatter,
-        backgroundColor: colors,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      }]
+      datasets: [
+        {
+          label: "Department pair",
+          data: scatter,
+          backgroundColor: colors,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        },
+        {
+          label: "Regression",
+          data: [],
+          showLine: true,
+          pointRadius: 0,
+          pointHoverRadius: 0,
+          borderColor: "rgba(128,0,0,0.5)",
+          borderWidth: 1.5,
+          borderDash: [5, 4],
+          backgroundColor: "transparent",
+          tension: 0,
+          order: 0,
+        },
+      ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
@@ -2288,6 +2608,8 @@ function initRingSpecies() {
       }
     }
   });
+
+  updateScatterStats(scatter);
 
   initRingTimeSeriesChart();
 
@@ -2332,6 +2654,7 @@ function setRingView(mode) {
   scatterWrap.style.display = "none";
   timeWrap.style.display = "none";
   forceWrap.style.display = "none";
+  document.getElementById("ring-scatter-stats").style.display = "none";
 
   btnS.style.cssText = "padding:2px 8px;font-size:.68rem;border:1px solid #ccc;border-radius:3px;background:#fff;color:#666;cursor:pointer;";
   btnT.style.cssText = "padding:2px 8px;font-size:.68rem;border:1px solid #ccc;border-radius:3px;background:#fff;color:#666;cursor:pointer;";
@@ -2339,6 +2662,7 @@ function setRingView(mode) {
 
   if (mode === "scatter") {
     scatterWrap.style.display = "";
+    document.getElementById("ring-scatter-stats").style.display = "";
     btnS.style.cssText = "padding:2px 8px;font-size:.68rem;border:1px solid #800000;border-radius:3px;background:#800000;color:#fff;cursor:pointer;font-weight:600;";
     title.textContent = "Spatial Distance vs. Keyword Similarity";
     sub.textContent   = ringCurrentYear === "all"
@@ -3030,11 +3354,10 @@ function showDeptKeywords() {
 }
 
 // ==========================================================================
-// Boot — init campus map immediately (visible tab)
+// Boot — About is visible first; heavy maps initialize lazily.
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-  tabInited["campus"] = true;
-  initCampusMap();
+  tabInited["about"] = true;
 });
 
 // ==========================================================================
@@ -3055,252 +3378,275 @@ const DEPT_HISTORY = [
   // ── PHYSICAL SCIENCES ────────────────────────────────────────────────────
   { name:"Chemistry", div:"PSD", url:"https://chemistry.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1967,b:"Kent Chemical Laboratory",src:"UChicago Library 'A Bold Experiment' exhibit"},
-      {from:1968,to:9999,b:"Searle Chemical Laboratory",src:"Footprint year_built 1968"}],
+      {from:1894,to:1967,b:"Kent Chemical Laboratory",src:"Heritage Survey D18 identifies Kent as the original chemistry building",u:"../GIS/heritage_pdfs/Heritage_Survey_D18_Kent_Chemical_Laboratory.pdf"},
+      {from:1968,to:9999,b:"Searle Chemical Laboratory",src:"Heritage Survey D09 says Searle was designed as additional space for the chemistry department",u:"../GIS/heritage_pdfs/Heritage_Survey_D09_Searle_Chemistry_Laboratory.pdf"}],
     predecessors:["Organic Chemistry","Physical Chemistry","Inorganic Chemistry","Analytical Chemistry"],
     notes:"One of the founding departments (1892). Sub-discipline names unified under Chemistry throughout the 20th century. Kent Chemical Lab was a gift from Sidney Kent."},
   { name:"Physics", div:"PSD", url:"https://physics.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1984,b:"Ryerson Laboratory",src:"UChicago Physics dept history; 'A Bold Experiment'"},
-      {from:1985,to:9999,b:"Kersten Physics Teaching Center",src:"Footprint year_built 1985"}],
+      {from:1894,to:1984,b:"Ryerson Laboratory",src:"Physics department history of Ryerson Laboratory",u:"https://physics.uchicago.edu/about/our-history/ryerson-laboratory/"},
+      {from:1985,to:9999,b:"Kersten Physics Teaching Center",src:"Administrative offices are located in the Kersten Physics Teaching Center",u:"https://physics.uchicago.edu/about/directions/"}],
     predecessors:["Natural Philosophy","Mathematical Physics","Medical Physics"],
     notes:"'Natural Philosophy' was the standard 19th-c. term for physics. Ryerson Physical Laboratory (1894) was the home until Kersten (1985)."},
-  { name:"Astronomy and Astrophysics", div:"PSD", url:"https://astro.uchicago.edu", activeEnd:null,
+  { name:"Astronomy and Astrophysics", div:"PSD", url:"https://astrophysics.uchicago.edu/", activeEnd:null,
     buildings:[
-      {from:1892,to:1984,b:"Ryerson Laboratory",src:"Shared with Physics; 'A Bold Experiment'"},
-      {from:1985,to:9999,b:"Kersten Physics Teaching Center",src:"Footprint year_built 1985"}],
+      {from:1894,to:1984,b:"Ryerson Laboratory",src:"Shared early physical-sciences home with Physics in Ryerson",u:"https://physics.uchicago.edu/about/our-history/ryerson-laboratory/"},
+      {from:1985,to:2014,b:"Astronomy and Astrophysics Center",src:"Archived department contact page identifies the Astronomy and Astrophysics Center at 5640 S. Ellis, reached through the Research Institutes Building",u:"https://lambda.gsfc.nasa.gov/product/suborbit/subonlambda/DASI/astro.uchicago.edu/aboutus/contact.shtml.html"},
+      {from:2015,to:9999,b:"William Eckhardt Research Center",src:"Department address is William Eckhardt Research Center, room 599",u:"https://astrophysics.uchicago.edu/about/contact-us/"}],
     predecessors:["Mathematical Astronomy","Astronomy","Astrophysics","Astronomical Sciences","Practical Astronomy and Astrophysics"],
-    notes:"Shared Ryerson Laboratory with Physics from the university's founding through 1984."},
-  { name:"Mathematics", div:"PSD", url:"https://math.uchicago.edu", activeEnd:null,
+    notes:"Shared Ryerson Laboratory with Physics in the early science quadrangle. The pre-WERC astronomy complex included the Astronomy and Astrophysics Center near 5630 S. Ellis; WERC opened in 2015 and now houses the department."},
+  { name:"Mathematics", div:"PSD", url:"https://mathematics.uchicago.edu/", activeEnd:null,
     buildings:[
-      {from:1892,to:1929,b:"Ryerson Laboratory",src:"UChicago Library Eckhart/Ryerson exhibit"},
-      {from:1930,to:9999,b:"Eckhart Hall",src:"UChicago Library Eckhart exhibit: 'erected in 1930, funds donated 1927 by Bernard A. Eckhart'"}],
+      {from:1894,to:1929,b:"Ryerson Laboratory",src:"UChicago Library Ryerson/Eckhart exhibit places mathematics in Ryerson before Eckhart",u:"https://www.lib.uchicago.edu/collex/exhibits/ryerson-physical-laboratory-and-eckhart-hall/eckhart-hall/"},
+      {from:1930,to:9999,b:"Eckhart Hall",src:"UChicago Library Eckhart exhibit: building erected in 1930 for mathematics",u:"https://www.lib.uchicago.edu/collex/exhibits/ryerson-physical-laboratory-and-eckhart-hall/eckhart-hall/"}],
     predecessors:["Applied Mathematics","Pure Mathematics","Mathematical Science","Computational and Applied Mathematics"],
     notes:"Eckhart Hall (1930) was built specifically for mathematics with a gift from Bernard A. Eckhart. Previously shared Ryerson with physics."},
   { name:"Statistics", div:"PSD", url:"https://stat.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1928,b:"Ryerson Laboratory",src:"Statistics grew from mathematics; shared Ryerson"},
-      {from:1929,to:9999,b:"Jones Laboratory",src:"Footprint year_built 1929 — UChicago Heritage Map"}],
+      {from:1892,to:1928,b:"Ryerson Laboratory",src:"Pre-department statistics predecessors mapped through Mathematics, which the UChicago Library exhibit places in Ryerson before Eckhart",u:"https://www.lib.uchicago.edu/collex/exhibits/ryerson-physical-laboratory-and-eckhart-hall/eckhart-hall/"},
+      {from:1929,to:9999,b:"Jones Laboratory",src:"Department site identifies Jones Laboratory as Statistics' campus home",u:"https://stat.uchicago.edu/"}],
     predecessors:["Mathematical Statistics","Applied Statistics"],
     notes:"Statistics grew from the Mathematics department; Jones Laboratory was built in 1929 as statistics gained independence."},
-  { name:"Computer Science", div:"PSD", url:"https://cs.uchicago.edu", activeEnd:null,
+  { name:"Computer Science", div:"PSD", url:"https://computerscience.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1983,b:"Ryerson Laboratory",src:"Nearest pre-dept home (math/physics building)"},
-      {from:1984,to:9999,b:"John Crerar Library",src:"Footprint year_built 1984; CS established as separate dept ~1984"}],
+      {from:1984,to:2017,b:"Ryerson Laboratory",src:"UChicago News says Computer Science resided in Ryerson before the Crerar renovation",u:"https://news.uchicago.edu/story/university-create-computer-and-data-science-hub-john-crerar-library"},
+      {from:2018,to:9999,b:"John Crerar Library",src:"CS department page says it moved into the renovated John Crerar Library in August 2018",u:"https://computerscience.uchicago.edu/about/our-building/"}],
     predecessors:["Information Sciences","Committee on Information Sciences"],
-    notes:"CS did not exist as a degree-granting department before ~1984. Information Sciences was the precursor committee; Ryerson is assigned as the pre-history spatial home."},
+    notes:"CS did not exist as a degree-granting department before ~1984. The department was in Ryerson before the University renovated Crerar as a computer/data-science hub; CS moved into Crerar in August 2018."},
   { name:"Geophysical Sciences", div:"PSD", url:"https://geosci.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1968,b:"Walker Museum",src:"Walker Museum built 1893 for geological collections"},
-      {from:1969,to:9999,b:"Hinds Laboratory",src:"Footprint year_built 1969"}],
+      {from:1892,to:1968,b:"Walker Museum",src:"Walker Museum Heritage Survey documents its original geological/natural-history museum role",u:"../GIS/heritage_pdfs/Heritage_Survey_D25_Walker_Museum.pdf"},
+      {from:1969,to:9999,b:"Hinds Laboratory",src:"The department is located in the Henry Hinds Laboratory for the Geophysical Sciences",u:"https://geosci.uchicago.edu/contact/"}],
     predecessors:["Geology","Mineralogy","Paleontology","Petrography","Stratigraphy","Meteorology","Geophysics","Physical Geography","Geography","Paleozoology","Geographical Studies"],
     notes:"Walker Museum (1893) was originally built to house geological and natural history collections. The many 19th-c. earth science sub-disciplines (Geology, Mineralogy, Paleontology, etc.) were unified into Geophysical Sciences through the 20th century."},
   { name:"Molecular Engineering", div:"PSD", url:"https://pme.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:2011,to:9999,b:"William Eckhardt Research Center",src:"PME est. 2011; WERC opened 2015"}],
+      {from:2015,to:9999,b:"William Eckhardt Research Center",src:"PME is headquartered in the William Eckhardt Research Center",u:"https://pme.uchicago.edu/about/facilities"}],
     predecessors:[],
     notes:"Pritzker School of Molecular Engineering is the university's newest school (est. 2011, named after a $100M Pritzker gift). WERC opened 2015. No historical predecessors."},
   // ── BIOLOGICAL SCIENCES ──────────────────────────────────────────────────
   { name:"Biochemistry and Molecular Biology", div:"BSD", url:"https://biochem.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1925,b:"Zoology Building",src:"Hull Biological Labs (Helen Culver gift, 1897)"},
-      {from:1926,to:1972,b:"Whitman Laboratory",src:"Footprint year_built 1926; BSD biophysics/biochem home. UChicago Grad Catalog 1960–1980."},
-      {from:1973,to:2004,b:"Cummings Life Sciences Center",src:"Footprint year_built 1973; BSD anchor building"},
-      {from:2005,to:9999,b:"Gordon Center for Integrative Science",src:"GCIS dedication 2005"}],
+      {from:1892,to:1896,b:"Cobb Hall",src:"Pre-Hull Court biological sciences; Zoology Building (Heritage Survey D05) completed 1897",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1897,to:1925,b:"Zoology Building",src:"Early biological-sciences predecessors mapped to Hull Biological Labs/Zoology Building",u:"../GIS/heritage_pdfs/Heritage_Survey_D05_Zoology_Building.pdf"},
+      {from:1926,to:1972,b:"Whitman Laboratory",src:"Contemporary articles place Biology/Biophysics work in Whitman Laboratory during this era",u:"https://pmc.ncbi.nlm.nih.gov/articles/PMC389141/"},
+      {from:1973,to:2004,b:"Cummings Life Sciences Center",src:"1990s-2000s BMB publications list the department in Cummings Life Science Center",u:"https://pubmed.ncbi.nlm.nih.gov/10465779/"},
+      {from:2005,to:9999,b:"Gordon Center for Integrative Science",src:"Department mailing address: Gordon Center for Integrative Science, 929 E. 57th Street",u:"https://biochem.uchicago.edu/about/contact-us"}],
     predecessors:["Biochemistry","Physiological Chemistry","Physiological Chemistry and Pharmacology","Biophysics (Committee, 1947–1980)","Biophysical Sciences","Cell and Molecular Biology","Cancer Biology","Molecular Metabolism and Nutrition","Human Nutrition and Nutritional Biology","Public Health Sciences (BSD)"],
     notes:"One of the most complex departmental lineages at UChicago. Committee on Biophysics (1947–1980) was in Whitman Lab; dissolved into BMB-adjacent programs. Human Nutrition and Nutritional Biology was the precursor to Molecular Metabolism and Nutrition (maps to BMB in ProQuest 2009+ records). Source: UChicago Grad Catalog 1960–1994."},
   { name:"Ecology and Evolution", div:"BSD", url:"https://ecologyandevolution.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1972,b:"Zoology Building",src:"Hull Biological Labs, Culver gift 1897"},
-      {from:1973,to:1993,b:"Cummings Life Sciences Center",src:"Committee on Biophysics & Theoretical Biology (1974–1994) in CLSC. UChicago Grad Catalog 1974–1994."},
-      {from:1994,to:9999,b:"Donnelley Biological Sciences Learning Center",src:"Footprint year_built 1994; E&E dept website"}],
+      {from:1892,to:1896,b:"Cobb Hall",src:"Pre-Hull Court; Zoology Building (Heritage Survey D05) completed 1897",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1897,to:1972,b:"Zoology Building",src:"Heritage Survey D05 (Zoology Building, built 1897, part of Hull Court)",u:"../GIS/heritage_pdfs/Heritage_Survey_D05_Zoology_Building.pdf"},
+      {from:1973,to:1993,b:"Cummings Life Sciences Center",src:"UChicago property footprint year_built 1973",u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
+      {from:1994,to:9999,b:"Donnelley Biological Sciences Learning Center",src:"Ecology and Evolution dept website; property footprint year_built 1994",u:"https://ecologyandevolution.uchicago.edu"}],
     predecessors:["Zoology","Botany","Animal Ecology","Plant Physiology","Biology","Evolutionary Biology","Committee on Evolutionary Biology","Theoretical Biology","Mathematical Biology","Developmental Biology","Integrative Biology","Biophysics and Theoretical Biology (1974–1994)"],
     notes:"Zoology, Botany, and Animal Ecology were separate departments in the Hull Biological Labs before consolidation. Evolutionary Biology was the direct predecessor (reorganized and renamed ~1990s). The Committee on Biophysics and Theoretical Biology (1974–1994) dissolved into E&E-adjacent programs."},
   { name:"Genetics Genomics and Systems Biology", div:"BSD", url:"https://ggsb.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:2004,b:"Zoology Building",src:"Genetics programs in Hull Biological Labs complex pre-GCIS"},
-      {from:2005,to:9999,b:"Gordon Center for Integrative Science",src:"GCIS dedication 2005"}],
+      {from:1892,to:1896,b:"Cobb Hall",src:"Pre-Hull Court; Zoology Building completed 1897",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1897,to:2004,b:"Zoology Building",src:"Pre-GGSB genetics predecessors mapped through the Hull Biological Labs/Zoology Building lineage",u:"https://ecologyandevolution.uchicago.edu/about"},
+      {from:2005,to:9999,b:"Gordon Center for Integrative Science",src:"GGSB and BMB are co-housed in GCIS; department office at 929 E 57th St",u:"https://ggsb.uchicago.edu/"}],
     predecessors:["Genetics","Committee on Genetics","Molecular Genetics and Cell Biology","Human Genetics","Development, Regeneration, and Stem Cell Biology"],
-    notes:"GGSB is a modern program (2000s) consolidating several genetics committees. Molecular Genetics and Cell Biology (MGCB) and Human Genetics (HGEN) folded into GGSB. Gordon Center for Integrative Science opened 2005."},
+    notes:"GGSB is a modern program (2000s) consolidating several genetics committees. Molecular Genetics and Cell Biology (MGCB), Human Genetics (HGEN), and related genetics training are mapped here; the current GGSB office is in the Gordon Center for Integrative Science."},
   { name:"Microbiology", div:"BSD", url:"https://microbiology.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1972,b:"Zoology Building",src:"Hull Biological Labs; 'A Bold Experiment'"},
-      {from:1973,to:9999,b:"Cummings Life Sciences Center",src:"Footprint year_built 1973"}],
+      {from:1892,to:1896,b:"Cobb Hall",src:"Pre-Hull Court biological sciences; Zoology Building (Heritage Survey D05) completed 1897",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1897,to:1972,b:"Zoology Building",src:"Microbiology/Bacteriology predecessors mapped to the early Hull Biological Labs/Zoology Building biology complex",u:"../GIS/heritage_pdfs/Heritage_Survey_D05_Zoology_Building.pdf"},
+      {from:1973,to:9999,b:"Cummings Life Sciences Center",src:"The Department of Microbiology is located in Cummings Life Science Center",u:"https://microbiology.uchicago.edu/contact-us"}],
     predecessors:["Bacteriology","Hygiene and Bacteriology","Bacteriology and Parasitology","Parasitology","Virology","Committee on Virology","Immunology","Committee on Immunology"],
     notes:"Bacteriology was the founding name; Hygiene and Bacteriology reflects early public health emphasis. Virology and Immunology committees co-housed in Cummings Life Sciences Center."},
   { name:"Organismal Biology and Anatomy", div:"BSD", url:"https://oba.bsd.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:9999,b:"Anatomy Building (Culver Hall)",src:"Hull Biological Labs, 1897; OBA's permanent home"}],
+      {from:1897,to:9999,b:"Anatomy Building (Culver Hall)",src:"OBA site lists the department at Anatomy, 1027 E. 57th Street",u:"https://oba.bsd.uchicago.edu/"}],
     predecessors:["Anatomy","Physiology","Embryology","Histology","Morphology","Neurology","Pharmacology","Pharmacological and Physiological Sciences","Cellular and Molecular Physiology","Developmental Biology","Neurobiology","Integrative Neuroscience","Surgery (clinical)","Medicine (clinical)","Pathology (clinical)"],
     notes:"OBA is a broad BSD umbrella department. Clinical labels (Surgery, Medicine, Pathology) appear in early records for students receiving PhDs through BSD programs; mapped to OBA as closest BSD anatomical sciences equivalent. Biopsychology → Psychology (not OBA)."},
   // ── HUMANITIES ───────────────────────────────────────────────────────────
   { name:"Art History", div:"Humanities", url:"https://arthistory.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1973,b:"Walker Museum",src:"Humanities overflow pre-CWAC"},
-      {from:1974,to:9999,b:"Cochrane-Woods Art Center",src:"CWAC opened 1974 — arthistory.uchicago.edu/about/cwac"}],
+      {from:1893,to:1973,b:"Walker Museum",src:"Heritage Survey D25 (Walker Museum, built 1893); CWAC page confirms Art History moved to CWAC in 1974",u:"../GIS/heritage_pdfs/Heritage_Survey_D25_Walker_Museum.pdf"},
+      {from:1974,to:9999,b:"Cochrane-Woods Art Center",src:"CWAC page says the Department of Art History moved into CWAC in 1974",u:"https://arthistory.uchicago.edu/about/cwac"}],
     predecessors:["History of Art","Fine Arts","Art and Archaeology","History of Art and Archaeology"],
-    notes:"Department moved to Cochrane-Woods Art Center when it opened in 1974. Walker Museum housed art history overflow and art collections previously."},
+    notes:"Art History was housed in Walker Museum until the move to Cochrane-Woods Art Center in 1974. The Smart Museum later separated administratively from the department in 1983."},
   { name:"Cinema and Media Studies", div:"Humanities", url:"https://cms.uchicago.edu", activeEnd:null,
-    buildings:[{from:1928,to:9999,b:"Wieboldt Hall",src:"Footprint year_built 1928; humanities languages building"}],
+    buildings:[{from:2005,to:9999,b:"Classics Building",src:"Department offices are in Classics 304, 1010 E. 59th St.",u:"https://cms.uchicago.edu/about/contact"}],
     predecessors:[],
-    notes:"A relatively modern program at UChicago. Wieboldt Hall (1928) is the humanities languages building and has been the home since the program's establishment."},
+    notes:"A relatively modern program at UChicago. The current departmental office is in the Classics Building."},
   { name:"Classics", div:"Humanities", url:"https://classics.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1914,b:"Cobb Hall",src:"First university building (1892); all humanities began here"},
-      {from:1915,to:9999,b:"Classics Building",src:"Footprint year_built 1915"}],
+      {from:1892,to:1914,b:"Cobb Hall",src:"Cobb Heritage Survey identifies Cobb as the original classroom/office building on campus",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1915,to:9999,b:"Classics Building",src:"Heritage Survey D41 says the building originally included the Classics departmental library and bookstacks",u:"../GIS/heritage_pdfs/Heritage_Survey_D41_Classics_Building.pdf"}],
     predecessors:["Greek","Greek Language and Literature","Latin","Latin Language and Literature","Classical Philology","Greek and Latin","Classical Archaeology","Classical Languages and Literatures","Ancient Mediterranean World"],
     notes:"One of the founding departments (1892). Individual language track names (Greek, Latin, Classical Philology) were unified under Classics through the 20th century."},
   { name:"Comparative Literature", div:"Humanities", url:"https://complit.uchicago.edu", activeEnd:null,
-    buildings:[{from:1928,to:9999,b:"Wieboldt Hall",src:"Footprint year_built 1928"}],
+    buildings:[
+      {from:1893,to:1927,b:"Cobb Hall",src:"Pre-Wieboldt humanities building; Wieboldt Hall opened 1928",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1928,to:9999,b:"Wieboldt Hall",src:"Heritage Survey D40 (Wieboldt Hall, built 1928); Comparative Literature current offices",u:"../GIS/heritage_pdfs/Heritage_Survey_D40_Wieboldt_Hall.pdf"}],
     predecessors:["Comparative Studies in Literature","Committee on Comparative Studies in Literature","Comparative Studies in Literature and the Arts","Literature"],
-    notes:"The Committee on Comparative Studies in Literature was the earlier name; became a full department over the 20th century."},
+    notes:"The Committee on Comparative Studies in Literature was the earlier name; the Humanities division says it reorganized as the Department of Comparative Literature in 1995. Current department offices are in Wieboldt Hall."},
   { name:"East Asian Languages and Civilizations", div:"Humanities", url:"https://ealc.uchicago.edu", activeEnd:null,
-    buildings:[{from:1928,to:9999,b:"Wieboldt Hall",src:"Footprint year_built 1928"}],
+    buildings:[{from:1968,to:9999,b:"Wieboldt Hall",src:"Department administrative offices are in Wieboldt 301E",u:"https://ealc.uchicago.edu/about/administrative-contacts"}],
     predecessors:["Far Eastern Languages and Civilizations","Far Eastern Languages","East Asian Studies","Chinese","Japanese"],
     notes:"'Far Eastern' was the standard mid-20th-c. terminology; renamed to East Asian Languages and Civilizations to reflect modern geographic framing. Individual language names (Chinese, Japanese) appear in early records."},
   { name:"English Language and Literature", div:"Humanities", url:"https://english.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1911,b:"Cobb Hall",src:"First university building"},
-      {from:1912,to:9999,b:"Harper Memorial Library",src:"Footprint year_built 1912; named for William Rainey Harper"}],
+      {from:1892,to:1911,b:"Cobb Hall",src:"Cobb Heritage Survey identifies Cobb as the original classroom/office building on campus",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1912,to:2024,b:"Harper Memorial Library",src:"Harper Heritage Survey documents Harper's 1912 library/classroom role; English occupancy is treated as a campus-directory inference",u:"../GIS/heritage_pdfs/Heritage_Survey_D38_Harper_Memorial_Library.pdf"},
+      {from:2025,to:9999,b:"Walker Hall",src:"Department contact page places English offices on the fourth floor of Walker Hall",u:"https://english.uchicago.edu/about/contact"}],
     predecessors:["English","English Literature","English Language and Linguistics"],
-    notes:"Harper Memorial Library (1912) became the English department's home. Named for William Rainey Harper, UChicago's founding president."},
+    notes:"English is a founding humanities department. Earlier records place humanities instruction in Cobb/Harper contexts, while the department's current office is Walker Hall; the Harper-to-Walker endpoint is approximate pending archival directory reconciliation."},
   { name:"Germanic Studies", div:"Humanities", url:"https://german.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1927,b:"Cobb Hall",src:"Teutonic Languages dept founded 1892"},
-      {from:1928,to:9999,b:"Wieboldt Hall",src:"Footprint year_built 1928; dedicated languages building"}],
+      {from:1892,to:1927,b:"Cobb Hall",src:"Teutonic Languages was a founding-era department mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1928,to:9999,b:"Wieboldt Hall",src:"Current Germanic Studies faculty/staff offices are listed in Wieboldt Hall",u:"https://german.uchicago.edu/people/margareta-ingrid-christian"}],
     predecessors:["German","German Language and Literature","Teutonic Languages","Teutonic Languages and Literature","Germanic Languages","Germanic Languages and Literatures","Germanic Languages and Civilizations","Germanics"],
     notes:"'Teutonic Languages' was the standard 19th-c. term; renamed Germanic Languages, then Germanic Studies in the 20th century."},
   { name:"Linguistics", div:"Humanities", url:"https://linguistics.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1914,b:"Cobb Hall",src:"Philology/Linguistics in early humanities building"},
-      {from:1915,to:9999,b:"Rosenwald Hall",src:"UChicago Library Julius Rosenwald exhibit; built 1915"}],
+      {from:1892,to:1914,b:"Cobb Hall",src:"Comparative Philology/Linguistics predecessors mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1915,to:9999,b:"Rosenwald Hall",src:"Department contact page places Linguistics in Rosenwald Hall, Room 203",u:"https://linguistics.uchicago.edu/about/contact-us"}],
     predecessors:["Comparative Philology","Indo-European Comparative Philology","Philology","General Linguistics"],
-    notes:"Comparative Philology was the 19th-c. precursor discipline. Rosenwald Hall was built in 1915 originally to house the Geography (now Geophysical Sciences) department; Linguistics moved there as well."},
+    notes:"Comparative Philology was the 19th-c. precursor discipline. Current Linguistics offices are in Rosenwald Hall; the exact historical move year remains an archival-directory inference."},
   { name:"Music", div:"Humanities", url:"https://music.uchicago.edu", activeEnd:null,
-    buildings:[{from:1892,to:9999,b:"Goodspeed Hall",src:"Goodspeed Hall built 1892 — one of the original campus buildings"}],
+    buildings:[{from:1892,to:9999,b:"Goodspeed Hall",src:"Music contact/performance-space pages identify Goodspeed Hall as the department's home",u:"https://music.uchicago.edu/about/contact"}],
     predecessors:["Musicology","Theory of Music","Theoretical Music"],
     notes:"Music has been in Goodspeed Hall since the university's founding in 1892 — one of the most continuous departmental-building relationships on campus."},
-  { name:"Near Eastern Languages and Civilizations", div:"Humanities", url:"https://nelc.uchicago.edu", activeEnd:null,
+  { name:"Near Eastern Languages and Civilizations", div:"Humanities", url:"https://mes.uchicago.edu/", activeEnd:null,
     buildings:[
-      {from:1892,to:1931,b:"Haskell Hall",src:"Haskell Oriental Museum built 1896 (gift of Sophia Haskell) for Semitic studies"},
-      {from:1932,to:9999,b:"Institute for the Study of Ancient Cultures",src:"Rockefeller-funded Oriental Institute opened 1932; renamed ISAC 2019 — isac.uchicago.edu/about/history-isac"}],
+      {from:1892,to:1895,b:"Cobb Hall",src:"Pre-Haskell Hall; Haskell Oriental Museum completed 1896 (Heritage Survey D39)",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1896,to:1931,b:"Haskell Hall",src:"Haskell Hall Heritage Survey identifies the building as the Haskell Oriental Museum for Semitic studies",u:"../GIS/heritage_pdfs/Heritage_Survey_D39_Haskell_Hall.pdf"},
+      {from:1932,to:9999,b:"Institute for the Study of Ancient Cultures",src:"ISAC history documents the 1932 Oriental Institute opening and later renaming",u:"https://isac.uchicago.edu/about/history-isac"}],
     predecessors:["Semitic Languages and Literatures","Semitic Languages","Semitics","Assyriology","Egyptology","Hebrew Language and Literature","Arabic Language and Literature","Old Testament Language and Literature","Biblical and Patristic Greek","Oriental Languages and Literatures","Oriental Languages and Civilizations"],
     notes:"Haskell Hall (1896) was built as the 'Haskell Oriental Museum' specifically for Semitic/Near Eastern studies. The Oriental Institute (now ISAC) opened 1932, funded by John D. Rockefeller Jr. Renamed ISAC in 2019 by faculty vote. The building name is corrected in the pipeline from 'Oriental Institute' to its current name."},
   { name:"Philosophy", div:"Humanities", url:"https://philosophy.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1939,b:"Cobb Hall",src:"First university building"},
-      {from:1940,to:9999,b:"Stuart Hall",src:"Footprint year_built 1940 — UChicago Heritage Map"}],
+      {from:1892,to:1939,b:"Cobb Hall",src:"Philosophy founding-era home mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1940,to:9999,b:"Stuart Hall",src:"Stuart Hall is the home of the Department of Philosophy",u:"https://philosophy.uchicago.edu/"}],
     predecessors:[],
     notes:"Philosophy is a founding department (1892). Stuart Hall (1940) has been the permanent home since construction."},
   { name:"Romance Languages and Literatures", div:"Humanities", url:"https://rll.uchicago.edu", activeEnd:null,
-    buildings:[{from:1892,to:9999,b:"Foster Hall",src:"Foster Hall built 1893 — one of the original campus buildings"}],
+    buildings:[
+      {from:1892,to:1927,b:"Cobb Hall",src:"Heritage Survey D21 (Cobb Hall, built 1892); original humanities classroom building pre-Wieboldt",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1928,to:9999,b:"Wieboldt Hall",src:"Wieboldt Heritage Survey D40: 'Built for Department of Modern Languages' (1928); RLL website confirms Wieboldt Hall 205",u:"../GIS/heritage_pdfs/Heritage_Survey_D40_Wieboldt_Hall.pdf"}],
     predecessors:["Romance Languages","Romance Philology","French","French Language and Literature","Spanish","Spanish Language and Literature","Italian","Italian Language and Literature","Portuguese"],
-    notes:"Foster Hall (1893) is one of the original campus buildings; Romance Languages has been there from the university's founding. Individual language names (French, Spanish, Italian, etc.) appear in records through the early 20th century."},
+    notes:"Wieboldt Heritage Survey D40 confirms the building was 'built for Department of Modern Languages' (1928). Pre-1928 home was Cobb Hall — Foster Hall was a women's dormitory until its 1963 renovation (Heritage Survey D35). Individual language names (French, Spanish, Italian, etc.) appear in records through the early 20th century."},
   { name:"Slavic Languages and Literatures", div:"Humanities", url:"https://slavic.uchicago.edu", activeEnd:null,
-    buildings:[{from:1928,to:9999,b:"Wieboldt Hall",src:"Footprint year_built 1928"}],
+    buildings:[
+      {from:1928,to:1963,b:"Wieboldt Hall",src:"Wieboldt Heritage Survey D40: 'Built for Department of Modern Languages' (1928) — Slavic is a modern language department; bar starts at 1928",u:"../GIS/heritage_pdfs/Heritage_Survey_D40_Wieboldt_Hall.pdf"},
+      {from:1963,to:9999,b:"Foster Hall",src:"Foster Hall Heritage Survey D35: converted from women's dorm to academic offices in 1963; Slavic contact page confirms Foster Hall Room 406",u:"../GIS/heritage_pdfs/Heritage_Survey_D35_Foster_Hall.pdf"}],
     predecessors:["Slavic Languages","Russian Language and Literature","Russian"],
-    notes:"Russian was the dominant early track. The program expanded into a broader Slavic languages and literatures focus in the mid-20th century."},
+    notes:"Slavic was not a founding department at UChicago. Wieboldt Hall (1928) was built for the Department of Modern Languages (Heritage Survey D40); Slavic was housed there from 1928 until Foster Hall was converted from a women's dormitory to academic offices in 1963 (Heritage Survey D35). Current offices: Foster Hall Room 406. First dissertation: 1962."},
   { name:"Social Thought", div:"Humanities", url:"https://socialthought.uchicago.edu", activeEnd:null,
-    buildings:[{from:1941,to:9999,b:"Wieboldt Hall",src:"Committee on Social Thought founded 1941 under Robert Maynard Hutchins"}],
+    buildings:[
+      {from:1941,to:1963,b:"Cobb Hall",src:"Heritage Survey D21 (Cobb Hall); pre-Foster-conversion home for cross-divisional humanities committees — Foster Hall was a women's dormitory until 1963",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1963,to:9999,b:"Foster Hall",src:"Foster Hall Heritage Survey D35: converted from women's dorm to academic offices in 1963; Social Thought contact page confirms 1130 E 59th St",u:"../GIS/heritage_pdfs/Heritage_Survey_D35_Foster_Hall.pdf"}],
     predecessors:["Committee on Social Thought"],
-    notes:"Founded 1941 under President Robert Maynard Hutchins as a cross-divisional committee. Many dissertations appear as joint programs (e.g., 'Social Thought and Philosophy') — assigned to Social Thought as primary/first-listed department."},
+    notes:"Founded 1941 by President Hutchins. Pre-1963 home was Cobb Hall (Foster Hall was a women's dormitory until its 1963 renovation — Heritage Survey D35). Current offices: Foster Hall, 1130 E. 59th St. Many dissertations appear as joint programs (e.g., 'Social Thought and Philosophy') — assigned to Social Thought as primary/first-listed department."},
   { name:"South Asian Languages and Civilizations", div:"Humanities", url:"https://salc.uchicago.edu", activeEnd:null,
-    buildings:[{from:1928,to:9999,b:"Wieboldt Hall",src:"Footprint year_built 1928"}],
+    buildings:[{from:1966,to:9999,b:"Foster Hall",src:"SALC site says the department was founded in 1966; contact page lists administration in Foster Hall",u:"https://salc.uchicago.edu/about/contact-us"}],
     predecessors:["Sanskrit","Sanskrit and Comparative Philology","Pali","Indic Philology"],
     notes:"Sanskrit was one of the founding specializations at UChicago (1892), reflecting 19th-c. philological traditions. The program expanded into SALC over the 20th century."},
   // ── DIVINITY ─────────────────────────────────────────────────────────────
   { name:"Divinity", div:"Divinity", url:"https://divinity.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1925,b:"Cobb Hall",src:"Divinity was one of the four founding schools (1892)"},
-      {from:1926,to:9999,b:"Swift Hall",src:"Divinity School Swift Hall 100th anniversary: 'completed in 1926'; named for Gustavus Franklin Swift Jr."}],
+      {from:1892,to:1925,b:"Cobb Hall",src:"Divinity founding-era home mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1926,to:9999,b:"Swift Hall",src:"Divinity School source says Swift Hall was completed for Divinity in 1926",u:"https://divinity.uchicago.edu/news/swift-hall-100"}],
     predecessors:["Old Testament Literature","New Testament Literature","Church History","Systematic Theology","Comparative Religion","History of Religions","Philosophy of Religion","Sacred Literature","Homiletics","Practical Theology","Christian Theology","Religion and Literature","Biblical Theology","Theology"],
     notes:"One of the four founding schools of UChicago (1892), alongside the arts and sciences, law, and graduate programs. All subdiscipline track names (Old Testament, New Testament, Church History, etc.) are administrative tracks within the school, not separate degree-granting departments."},
   { name:"Jewish Studies", div:"Divinity", url:"https://ccjs.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1925,b:"Cobb Hall",src:"Affiliated with Divinity; shares pre-Swift Hall home"},
-      {from:1926,to:9999,b:"Swift Hall",src:"Affiliated with Divinity School; shares Swift Hall — Divinity School Swift Hall 100th"}],
+      {from:1892,to:1925,b:"Cobb Hall",src:"Jewish Studies predecessors mapped through Divinity's pre-Swift founding-era Cobb home",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1926,to:9999,b:"Swift Hall",src:"Jewish Studies is affiliated with Divinity; Swift Hall has housed Divinity since 1926",u:"https://divinity.uchicago.edu/news/swift-hall-100"}],
     predecessors:[],
     notes:"The Program in Jewish Studies is affiliated with the Divinity School and shares Swift Hall. Listed as a separate department because ProQuest records it as a distinct administrative unit for dissertations."},
   // ── SOCIAL SCIENCES ──────────────────────────────────────────────────────
   { name:"Anthropology", div:"SSD", url:"https://anthropology.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1931,b:"Cobb Hall",src:"Founding department; early combined with Sociology"},
-      {from:1932,to:9999,b:"Haskell Hall",src:"NELC vacated Haskell for Oriental Institute (1932); Anthropology moved in"}],
+      {from:1892,to:1931,b:"Cobb Hall",src:"Anthropology/Sociology founding-era home mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1932,to:1978,b:"Walker Museum",src:"Haskell Heritage Survey says Anthropology became Haskell's occupant in 1979 via a swap of Walker for Haskell",u:"../GIS/heritage_pdfs/Heritage_Survey_D39_Haskell_Hall.pdf"},
+      {from:1979,to:9999,b:"Haskell Hall",src:"Haskell Heritage Survey documents Anthropology's 1979 move to Haskell through the Walker/Haskell swap",u:"../GIS/heritage_pdfs/Heritage_Survey_D39_Haskell_Hall.pdf"}],
     predecessors:["Social Anthropology","Cultural Anthropology","Physical Anthropology"],
-    notes:"Anthropology moved to Haskell Hall (1896) when NELC vacated it for the newly opened Oriental Institute in 1932. Early records sometimes combine Sociology and Anthropology — assigned to Sociology as primary."},
+    notes:"After NELC vacated Haskell for the Oriental Institute (1932), Haskell was assigned to the Business School. Anthropology occupied Walker Museum from 1932 until 1979, when it acquired Haskell via a building swap (Anthropology surrendered Walker; Business School gave up Haskell). Source: UChicago Facilities Heritage Survey D39, 2012. Early records sometimes combine Sociology and Anthropology — assigned to Sociology as primary."},
   { name:"Comparative Human Development", div:"SSD", url:"https://humdev.uchicago.edu", activeEnd:null,
-    buildings:[{from:1939,to:9999,b:"Green Hall",src:"Committee on Human Development established 1939; Green Hall shared with Psychology"}],
+    buildings:[{from:1939,to:9999,b:"Rosenwald Hall",src:"Department contact page places Comparative Human Development offices on the third floor of Rosenwald Hall",u:"https://humdev.uchicago.edu/about/contact-us"}],
     predecessors:["Human Development","Child Development","Committee on Human Development","Behavioral Sciences: Human Development","Psychology: Human Development","Developmental Psychology/Mental Health Research"],
-    notes:"Committee on Human Development founded 1940 under Ralph Tyler. Shares Green Hall with Psychology. Many historical records carry 'Behavioral Sciences' or 'Psychology: Human Development' prefixes that map here."},
+    notes:"Committee on Human Development founded around 1940 under Ralph Tyler. Current department offices are in Rosenwald Hall. Many historical records carry 'Behavioral Sciences' or 'Psychology: Human Development' prefixes that map here."},
   { name:"Conceptual and Historical Studies of Science", div:"SSD", url:"https://chss.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1928,b:"Cobb Hall",src:"Pre-SSRB; early committee home"},
-      {from:1929,to:9999,b:"Social Science Research Building",src:"SSRB 1929; CHSS co-housed with History"}],
+      {from:1892,to:1928,b:"Cobb Hall",src:"Pre-SSRB committee predecessors mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1929,to:9999,b:"Social Science Research Building",src:"CHSS site lists the committee at 1126 E. 59th Street, Rooms 205-208",u:"https://chss.uchicago.edu/"}],
     predecessors:["Analysis of Ideas and Study of Methods","Analysis of Ideas and the Study of Methods","Conceptual Foundations of Science","Committee on Conceptual Foundations of Science","History of Culture","Committee on History of Culture"],
     notes:"One of UChicago's unique interdisciplinary committees. Evolved through several names: Analysis of Ideas and Study of Methods → Conceptual Foundations of Science → CHSS. History of Culture mapped here as closest committee equivalent (judgment call — also defensible as History)."},
   { name:"Economics", div:"SSD", url:"https://economics.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1928,b:"Cobb Hall",src:"First university building"},
-      {from:1929,to:2008,b:"Social Science Research Building",src:"SSRB funded by Laura Spelman Rockefeller Memorial, 1929"},
-      {from:2009,to:9999,b:"Saieh Hall for Economics",src:"Named after alumnus Saieh; Economics dept moved ~2009"}],
+      {from:1892,to:1928,b:"Cobb Hall",src:"Economics/Political Economy founding-era home mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1929,to:2013,b:"Social Science Research Building",src:"Rockefeller Archive says UChicago received funds to build the Social Science Research Building; Heritage Survey says it housed Economics offices",u:"https://resource.rockarch.org/story/history-of-laura-spelman-rockefeller-memorial-legitimizing-social-sciences-1920s/"},
+      {from:2014,to:9999,b:"Saieh Hall for Economics",src:"Renovation completed in June 2014 to house the Department of Economics and Becker Friedman Institute",u:"https://facilities.uchicago.edu/construction/5757south-university/"}],
     predecessors:["Political Economy"],
-    notes:"'Political Economy' was the standard 19th-c. term for what became the Economics department. The SSRB (1929) was the home of the 'Chicago School of Economics.' Saieh Hall for Economics opened ~2009. The Center for Economics of Human Development (Heckman) is in the adjacent 5740 S. Woodlawn building, successor to the Home Economics research space."},
-  { name:"Education", div:"SSD", url:"https://coe.uchicago.edu", activeEnd:null,
+    notes:"'Political Economy' was the standard 19th-c. term for what became the Economics department. SSRB housed Economics offices after the Rockefeller-funded social-science expansion. Saieh Hall's renovation was completed in 2014 for Economics and BFI."},
+  { name:"Education", div:"SSD", url:"https://coe.ssd.uchicago.edu/", activeEnd:null,
     buildings:[
-      {from:1892,to:1930,b:"Cobb Hall",src:"Education/Pedagogy in first university building"},
-      {from:1931,to:9999,b:"Judd Hall",src:"Footprint year_built 1931; named for Charles Hubbard Judd — Facilities Services"}],
+      {from:1892,to:1930,b:"Cobb Hall",src:"Education/Pedagogy founding-era home mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1931,to:9999,b:"Judd Hall",src:"UChicago Library guide says the Education Library was located in Judd Hall with the Department of Education",u:"https://guides.lib.uchicago.edu/c.php?g=297396&p=1992108"}],
     predecessors:["Pedagogy","Educational Administration","School Administration","Education and Pedagogy"],
     notes:"Judd Hall (1931) is at 5814–5840 S Kenwood Ave, physically adjacent to the University of Chicago Laboratory Schools — this is correct; Judd Hall and the Lab School share the same block on Kenwood. The PhD program was effectively discontinued around 2007 (last regular dissertations); the 2014 and 2019 records are late completions. Education research now primarily runs through the Urban Education Institute. The department still exists formally. 'Pedagogy' was the 19th-c. term; Judd was a prominent educational psychologist at UChicago."},
   { name:"History", div:"SSD", url:"https://history.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1928,b:"Cobb Hall",src:"History is a founding department (1892)"},
-      {from:1929,to:9999,b:"Social Science Research Building",src:"SSRB funded by Laura Spelman Rockefeller Memorial, 1929"}],
+      {from:1892,to:1928,b:"Cobb Hall",src:"History founding-era home mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1929,to:9999,b:"Social Science Research Building",src:"Rockefeller Archive documents the 1929 Social Science Research Building grant for UChicago's social sciences",u:"https://resource.rockarch.org/story/history-of-laura-spelman-rockefeller-memorial-legitimizing-social-sciences-1920s/"}],
     predecessors:["American History","European History","Medieval History","Modern History","Ancient History","Historical Studies"],
     notes:"Founding department (1892). Sub-field labels (American History, European History, etc.) appear as primary department names in early records. SSRB (1929) has been the home since."},
   { name:"Political Science", div:"SSD", url:"https://political-science.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1928,b:"Cobb Hall",src:"Political science in first university building"},
-      {from:1929,to:1970,b:"Social Science Research Building",src:"SSRB 1929"},
-      {from:1971,to:9999,b:"Pick Hall",src:"Footprint year_built 1971; named for Albert Pick Jr. — UChicago Heritage Map"}],
+      {from:1892,to:1928,b:"Cobb Hall",src:"Political Science founding-era home mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1929,to:1970,b:"Social Science Research Building",src:"Rockefeller Archive names Charles Merriam's political-science work among the 1920s social-science expansion",u:"https://resource.rockarch.org/story/history-of-laura-spelman-rockefeller-memorial-legitimizing-social-sciences-1920s/"},
+      {from:1971,to:9999,b:"Pick Hall",src:"Current department offices are in Pick Hall",u:"https://political-science.uchicago.edu/about/contact-us"}],
     predecessors:["Political Institutions","Political Science and Administrative Law"],
     notes:"Political Science moved from SSRB to Pick Hall when it opened in 1971."},
   { name:"Psychology", div:"SSD", url:"https://psychology.uchicago.edu", activeEnd:null,
-    buildings:[{from:1892,to:9999,b:"Green Hall",src:"Green Hall built 1898 (footprint year_built 1898); Psychology's long-standing home; shared with CHD"}],
+    buildings:[
+      {from:1892,to:1897,b:"Cobb Hall",src:"Pre-Green Hall; Psychology/experimental psychology mapped to Cobb's original classroom role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1898,to:9999,b:"Green Hall",src:"Heritage Survey D33 (Green Hall); Psychology has been in Green Hall since construction in 1898",u:"../GIS/heritage_pdfs/Heritage_Survey_D33_Green_Hall.pdf"}],
     predecessors:["Experimental Psychology","Social Psychology","Biopsychology (track within Psychology)"],
-    notes:"Green Hall (1898) has been Psychology's home since construction. Biopsychology is an administrative track within Psychology — NOT mapped to OBA (a previous pipeline error that was corrected). All 'Behavioral Sciences' track names (Cognition, Methodology, etc.) originate from Psychology dept internal naming."},
+    notes:"Psychology has been in Green Hall since its construction in 1898. Biopsychology is an administrative track within Psychology — NOT mapped to OBA (a previous pipeline error that was corrected)."},
   { name:"Social Service Administration", div:"SSD", url:"https://crownschool.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1962,b:"Cobb Hall",src:"SSA founded 1908; in Cobb Hall until own building"},
-      {from:1963,to:9999,b:"Crown Family School of Social Work, Policy, and Practice",src:"Footprint year_built 1963; renamed ~2020 after Crown Family gift"}],
+      {from:1908,to:1962,b:"Cobb Hall",src:"SSA Heritage Survey says Social Service Administration was located in Cobb Hall before its dedicated building",u:"../GIS/heritage_pdfs/Heritage_Social_Service_Administration.pdf"},
+      {from:1963,to:9999,b:"Crown Family School of Social Work, Policy, and Practice",src:"Heritage Survey says Social Service Administration was in Cobb Hall and that the dedicated SSA building has classrooms and offices",u:"../GIS/heritage_pdfs/Heritage_Social_Service_Administration.pdf"}],
     predecessors:["School of Social Service Administration","The Graduate School of Social Service Administration","Social Work, Policy, and Practice","Health Studies"],
     notes:"SSA was founded in 1908, often credited to Julia Lathrop. The building is listed as 'Crown Family School' in uchicago_locations.csv — corrected in the pipeline to the full GeoJSON canonical name. Renamed from SSA to Crown Family School ~2020."},
   { name:"Sociology", div:"SSD", url:"https://sociology.uchicago.edu", activeEnd:null,
     buildings:[
-      {from:1892,to:1928,b:"Cobb Hall",src:"Sociology founding department (1892)"},
-      {from:1929,to:9999,b:"Social Science Research Building",src:"SSRB 1929; home of the 'Chicago School of Sociology'"}],
+      {from:1892,to:1928,b:"Cobb Hall",src:"Sociology founding-era home mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1929,to:9999,b:"Social Science Research Building",src:"Rockefeller Archive names Robert Park and Ernest Burgess's sociology work among the 1920s social-science expansion",u:"https://resource.rockarch.org/story/history-of-laura-spelman-rockefeller-memorial-legitimizing-social-sciences-1920s/"}],
     predecessors:["Social Science","Sociology and Anthropology"],
     notes:"'Social Science' was a generic early catch-all for social science programs. 'Sociology and Anthropology' was an early combined department; Sociology is assigned as primary. The SSRB (1929) is historically associated with the Chicago School of Sociology."},
   // ── PROFESSIONAL SCHOOLS ─────────────────────────────────────────────────
   { name:"Business", div:"Professional", url:"https://www.chicagobooth.edu", activeEnd:null,
     buildings:[
-      {from:1898,to:2003,b:"Rosenwald Hall",src:"GSB founded 1898 as College of Commerce and Administration; Rosenwald Hall pre-Booth era"},
-      {from:2004,to:9999,b:"Booth School of Business",src:"Booth building (Charles M. Harper Center) opened 2004"}],
+      {from:1898,to:1958,b:"Cobb Hall",src:"1915-16 campus directory places the Dean of the College of Commerce and Administration in Cobb Hall; this anchors pre-1959 Business offices",u:"https://fromthepage.com/utl/innis-family-fonds/quaylediaries19151916?page=7"},
+      {from:1959,to:1970,b:"Stuart Hall",src:"Heritage Survey D37 says Stuart Hall was assigned to the Business School in 1959",u:"../GIS/heritage_pdfs/Heritage_Survey_D37_Stuart_Hall.pdf"},
+      {from:1971,to:2003,b:"Rosenwald Hall",src:"Heritage Survey D24 says Rosenwald was turned over to the Graduate School of Business in 1971 until 2004",u:"../GIS/heritage_pdfs/Heritage_Survey_D24_Rosenwald_Hall.pdf"},
+      {from:2004,to:9999,b:"Booth School of Business",src:"Heritage Survey E44 says Harper Center houses classrooms, labs, and offices for Booth",u:"../GIS/heritage_pdfs/Heritage_Survey_E44_Charles_M._Harper_Center.pdf"}],
     predecessors:["Graduate School of Business","School of Business","The School of Commerce and Administration"],
     notes:"Founded 1898 as the College of Commerce and Administration. Became 'Graduate School of Business' in 1942. Named Booth School of Business in 2008 after a $300M gift from David G. Booth (MBA'71). 'Harper Center' is UChicago's internal name for the building — corrected in the pipeline to GeoJSON name 'Booth School of Business'."},
   { name:"Public Policy Studies", div:"Professional", url:"https://harris.uchicago.edu", activeEnd:null,
-    buildings:[{from:1988,to:9999,b:"Keller Center",src:"Harris School founded 1988 (named after Irving B. Harris)"}],
+    buildings:[
+      {from:1988,to:2018,b:"1155 East 60th Street (former ABA office)",src:"Harris was housed at 1155 E. 60th St. for most of its history since becoming a professional school in 1988",u:"https://harris.uchicago.edu/news-events/news/new-keller-center-reflects-harris-public-policys-growing-ambitions"},
+      {from:2019,to:9999,b:"Keller Center",src:"Harris officially opened its new home in the Keller Center on January 7, 2019",u:"https://harris.uchicago.edu/admissions/blog/spotlight-keller-center"},
+    ],
     predecessors:["Irving B. Harris Graduate School of Public Policy Studies","Committee on Public Policy Studies","Planning","Committee on Planning"],
     notes:"Harris School founded 1988. 'Planning' and 'Committee on Planning' (11 + 5 records, 1955–1976) are pre-Harris urban planning committee names mapped here as the closest functional predecessor. 'International Relations' and 'Committee on International Relations' were corrected to Political Science after audit — those 100+ records (1934–1965) were from a social science IR committee producing political science research, not policy work."},
   { name:"Home Economics", div:"Professional", url:"https://www.lib.uchicago.edu/collex/exhibits/recipes-domesticity/household-subject-academic-study/", activeEnd:1956,
     buildings:[
-      {from:1892,to:1928,b:"Cobb Hall",src:"Default for early depts pre-own-building — building unconfirmed for this era"},
-      {from:1929,to:1956,b:"5740 South Woodlawn Avenue",src:"CEHD building history (cehd.uchicago.edu): 'previously used by the Department of Home Economics and Household Administration for research' starting 1929"}],
+      {from:1892,to:1928,b:"Cobb Hall",src:"Home Economics/Sanitary Science founding-era home mapped to Cobb's original classroom/office role",u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+      {from:1929,to:1956,b:"5740 South Woodlawn Avenue",src:"CEHD building history says 5740 S. Woodlawn was used by Home Economics and Household Administration for research starting in 1929",u:"https://cehd.uchicago.edu/?page_id=12"}],
     predecessors:["Home Economics","Home Economics and Household Administration","Sanitary Science (founding name, 1892)","Household Administration (mid-period name)"],
     notes:"Lineage: Dept of Sanitary Science (1892, under Marion Talbot) → Household Administration → Home Economics under Margaret Reid (~1951) → dissolved 1956. Reid moved to the Economics dept after dissolution. The 5740 S. Woodlawn building now houses UChicago's Center for the Economics of Human Development (est. 2014, James Heckman). The sanitary science lineage also connects to the modern Dept of Public Health Sciences in BSD. ~72 records in dataset."},
   { name:"Graduate Library School", div:"Professional", url:"https://en.wikipedia.org/wiki/University_of_Chicago_Graduate_Library_School", activeEnd:1989,
     buildings:[
-      {from:1926,to:1969,b:"Harper Memorial Library",src:"Wikipedia — UChicago GLS; UChicago Library finding aid ICU.SPCL.GRADLIBRARY"},
-      {from:1970,to:1989,b:"Joseph Regenstein Library",src:"Regenstein opened 1970 (footprint year_built 1970); GLS housed on east side; discontinued 1989 under President Hanna Gray"}],
+      {from:1926,to:1969,b:"Harper Memorial Library",src:"UChicago Library GLS finding aid documents the Graduate Library School records and 1928-1979 archival span",u:"https://www.lib.uchicago.edu/e/scrc/findingaids/view.php?eadid=ICU.SPCL.GRADLIBRARY"},
+      {from:1970,to:1989,b:"Joseph Regenstein Library",src:"GLS sources document the school through the Regenstein era and its 1989 discontinuance",u:"https://en.wikipedia.org/wiki/University_of_Chicago_Graduate_Library_School"}],
     predecessors:["Library Science"],
     notes:"First library school in the US to offer a PhD. Founded 1926. Moved to Joseph Regenstein Library when it opened in 1970. Discontinued 1989 under President Hanna Gray with no successor department. ~141 records in dataset. Sources: Wikipedia — UChicago GLS; UChicago Library finding aid ICU.SPCL.GRADLIBRARY (1928–1979)."},
 ];
@@ -3357,15 +3703,15 @@ function filterDeptGantt() {
 
 // Current building address for each canonical dept
 const DEPT_ADDRS = {
-  "Anthropology":"Haskell Hall, 5836 S Greenwood Ave","Astronomy and Astrophysics":"Kersten Physics Teaching Center, 5720 S Ellis Ave",
+  "Anthropology":"Haskell Hall, 5836 S Greenwood Ave","Astronomy and Astrophysics":"William Eckhardt Research Center, 5640 S Ellis Ave",
   "Biochemistry and Molecular Biology":"Gordon Center for Integrative Science, 929 E 57th St","Business":"Booth School of Business, 5807 S Woodlawn Ave",
-  "Chemistry":"Searle Chemical Laboratory, 5735 S Ellis Ave","Cinema and Media Studies":"Wieboldt Hall, 1050 E 59th St",
-  "Classics":"Classics Building, 1010 E 59th St","Comparative Human Development":"Green Hall, 5848 S University Ave",
-  "Comparative Literature":"Wieboldt Hall, 1050 E 59th St","Computer Science":"John Crerar Library, 5730 S Ellis Ave",
+  "Chemistry":"Searle Chemical Laboratory, 5735 S Ellis Ave","Cinema and Media Studies":"Classics Building, 1010 E 59th St",
+  "Classics":"Classics Building, 1010 E 59th St","Comparative Human Development":"Rosenwald Hall, 1101 E 58th St",
+  "Comparative Literature":"Walker Hall, 1115 E 58th St","Computer Science":"John Crerar Library, 5730 S Ellis Ave",
   "Conceptual and Historical Studies of Science":"Social Sciences Research Building, 1126 E 59th St","Divinity":"Swift Hall, 1025 E 58th St",
-  "East Asian Languages and Civilizations":"Wieboldt Hall, 1050 E 59th St","Ecology and Evolution":"Donnelley BSLC, 924 E 57th St",
+  "East Asian Languages and Civilizations":"Wieboldt Hall, 1050 E 59th St","Ecology and Evolution":"Zoology Building, 1101 E 57th St",
   "Economics":"Saieh Hall for Economics, 5757 S University Ave","Education":"Judd Hall, 5835 S Kimbark Ave",
-  "English Language and Literature":"Harper Memorial Library, 1116 E 59th St","Genetics Genomics and Systems Biology":"Gordon Center for Integrative Science, 929 E 57th St",
+  "English Language and Literature":"Walker Hall, 1115 E 58th St","Genetics Genomics and Systems Biology":"Cummings Life Sciences Center, 920 E 58th St",
   "Geophysical Sciences":"Hinds Laboratory, 5734 S Ellis Ave","Germanic Studies":"Wieboldt Hall, 1050 E 59th St",
   "Graduate Library School":"Joseph Regenstein Library, 1100 E 57th St (discontinued 1989)","History":"Social Sciences Research Building, 1126 E 59th St",
   "Home Economics":"5740 S Woodlawn Ave (dissolved 1956)","Jewish Studies":"Swift Hall, 1025 E 58th St",
@@ -3375,73 +3721,88 @@ const DEPT_ADDRS = {
   "Organismal Biology and Anatomy":"Culver Hall (Anatomy Building), 1025 E 57th St","Philosophy":"Stuart Hall, 5835 S Greenwood Ave",
   "Physics":"Kersten Physics Teaching Center, 5720 S Ellis Ave","Political Science":"Pick Hall, 5828 S University Ave",
   "Psychology":"Green Hall, 5848 S University Ave","Public Policy Studies":"Keller Center, 1307 E 60th St",
-  "Romance Languages and Literatures":"Foster Hall, 1130 E 59th St","Slavic Languages and Literatures":"Wieboldt Hall, 1050 E 59th St",
-  "Social Service Administration":"Crown Family School, 969 E 60th St","Social Thought":"Wieboldt Hall, 1050 E 59th St",
-  "Sociology":"Social Sciences Research Building, 1126 E 59th St","South Asian Languages and Civilizations":"Wieboldt Hall, 1050 E 59th St",
+  "Romance Languages and Literatures":"Wieboldt Hall, 1050 E 59th St","Slavic Languages and Literatures":"Foster Hall, 1130 E 59th St",
+  "Social Service Administration":"Crown Family School, 969 E 60th St","Social Thought":"Foster Hall, 1130 E 59th St",
+  "Sociology":"Social Sciences Research Building, 1126 E 59th St","South Asian Languages and Civilizations":"Foster Hall, 1130 E 59th St",
   "Statistics":"Jones Laboratory, 5747 S Ellis Ave",
 };
 
-// Per-building source links for building timeline table
+// Supplemental building-background links retained in the data file.
+// Department cards now render row-specific era.src evidence instead of these
+// shared building links, because occupancy claims need department-specific
+// citations rather than generic building pages.
+// PDFs are UChicago Facilities Heritage Survey documents (relative path from vis/)
 const BLDG_SOURCES = {
-  "Ryerson Laboratory":               {t:"UChicago Physics — Ryerson Laboratory history", u:"https://physics.uchicago.edu/about/our-history/ryerson-laboratory/"},
-  "Kent Chemical Laboratory":         {t:"UChicago Library 'A Bold Experiment'", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/"},
-  "Eckhart Hall":                     {t:"UChicago Library — Eckhart Hall exhibit", u:"https://www.lib.uchicago.edu/collex/exhibits/ryerson-physical-laboratory-and-eckhart-hall/eckhart-hall/"},
-  "Walker Museum":                    {t:"UChicago Library 'A Bold Experiment'", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/"},
-  "Zoology Building":                 {t:"UCM Facilities — Hull Court Complex (1897)", u:"https://ucmfacilities.uchicago.edu/construction/project_archive/hull_court_complex/"},
-  "Anatomy Building":                 {t:"UCM Facilities — Hull Court Complex (1897)", u:"https://ucmfacilities.uchicago.edu/construction/project_archive/hull_court_complex/"},
-  "Whitman Laboratory":               {t:"UChicago Graduate Catalogs 1960–1994 (Library Archives)"},
-  "Cummings Life Sciences Center":    {t:"UCM Facilities — Hull Court Complex", u:"https://ucmfacilities.uchicago.edu/construction/project_archive/hull_court_complex/"},
-  "Gordon Center for Integrative Science":{t:"UChicago BSD — GCIS dedication 2005", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Donnelley Biological Sciences Learning Center":{t:"UChicago Heritage Map (year_built 1994)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Haskell Hall":                     {t:"Haskell Oriental Museum built 1896 — UChicago Library", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/"},
+  // ── Physical Sciences ──────────────────────────────────────────────────
+  "Ryerson Laboratory":               {t:"UChicago Facilities Heritage Survey — Ryerson Laboratory (D17, 2011)", u:"../GIS/heritage_pdfs/Heritage_Survey_D17_Ryerson_Laboratory.pdf"},
+  "Kent Chemical Laboratory":         {t:"UChicago Facilities Heritage Survey — Kent Chemical Laboratory (D18)", u:"../GIS/heritage_pdfs/Heritage_Survey_D18_Kent_Chemical_Laboratory.pdf"},
+  "Searle Chemical Laboratory":       {t:"UChicago Facilities Heritage Survey — Searle Chemistry Laboratory (D09)", u:"../GIS/heritage_pdfs/Heritage_Survey_D09_Searle_Chemistry_Laboratory.pdf"},
+  "Eckhart Hall":                     {t:"UChicago Facilities Heritage Survey — Eckhart Hall (D16)", u:"../GIS/heritage_pdfs/Heritage_Survey_D16_Eckhart_Hall.pdf"},
+  "Jones Laboratory":                 {t:"UChicago Facilities Heritage Survey — Jones Laboratory (D19)", u:"../GIS/heritage_pdfs/Heritage_Survey_D19_Jones_Laboratory.pdf"},
+  "John Crerar Library":              {t:"John Crerar Library history — UChicago Library (opened 1984)", u:"https://www.lib.uchicago.edu/crerar/about-crerar-library/history/"},
+  "Walker Museum":                    {t:"UChicago Facilities Heritage Survey — Walker Museum (D25)", u:"../GIS/heritage_pdfs/Heritage_Survey_D25_Walker_Museum.pdf"},
+  "Hinds Laboratory":                 {t:"UChicago Facilities Heritage Survey — Hinds Laboratory (A08)", u:"../GIS/heritage_pdfs/Heritage_Survey_A08_Hinds_Laboratory.pdf"},
+  "Kersten Physics Teaching Center":  {t:"Kersten Physics Teaching Center — UChicago Physics", u:"https://kersten.uchicago.edu/"},
+  "William Eckhardt Research Center": {t:"UChicago Facilities Services — William Eckhardt Research Center", u:"../GIS/heritage_pdfs/William%20Eckhardt%20Research%20Center%20%7C%20The%20University%20of%20Chicago%20Facilities%20Services.pdf"},
+  // ── Biological Sciences ────────────────────────────────────────────────
+  "Zoology Building":                 {t:"UChicago Facilities Heritage Survey — Zoology Building (D05, 2011)", u:"../GIS/heritage_pdfs/Heritage_Survey_D05_Zoology_Building.pdf"},
+  "Anatomy Building (Culver Hall)":   {t:"UChicago Facilities Heritage Survey — Anatomy Building (D06)", u:"../GIS/heritage_pdfs/Heritage_Survey_D06_Anatomy.pdf"},
+  "Whitman Laboratory":               {t:"UChicago Graduate Catalogs 1960–1994 (UChicago Library Archives)"},
+  "Cummings Life Sciences Center":    {t:"Cummings Life Sciences Center — UCM Facilities Design & Construction", u:"https://ucmfacilities.uchicago.edu/construction/project_archive/cummings_life_sciences_center/"},
+  "Gordon Center for Integrative Science":{t:"Gordon Center for Integrative Science — Explore the architecture at UChicago", u:"https://architecture.uchicago.edu/locations/gordon_center_for_integrative_science/"},
+  "Donnelley Biological Sciences Learning Center":{t:"Biological Sciences Learning Center — UCM Facilities Design & Construction", u:"https://ucmfacilities.uchicago.edu/construction/project_archive/biological_sciences_learning_center/"},
+  // ── Humanities ─────────────────────────────────────────────────────────
+  "Cobb Hall":                        {t:"UChicago Facilities Heritage Survey — Cobb Lecture Hall (D21, 2012)", u:"../GIS/heritage_pdfs/Heritage_Survey_D21_Cobb_Lecture_Hall.pdf"},
+  "Rosenwald Hall":                   {t:"UChicago Facilities Heritage Survey — Rosenwald Hall (D24)", u:"../GIS/heritage_pdfs/Heritage_Survey_D24_Rosenwald_Hall.pdf"},
+  "Harper Memorial Library":          {t:"UChicago Facilities Heritage Survey — Harper Memorial Library (D38)", u:"../GIS/heritage_pdfs/Heritage_Survey_D38_Harper_Memorial_Library.pdf"},
+  "Haskell Hall":                     {t:"UChicago Facilities Heritage Survey — Haskell Hall (D39, 2012)", u:"../GIS/heritage_pdfs/Heritage_Survey_D39_Haskell_Hall.pdf"},
   "Institute for the Study of Ancient Cultures":{t:"History of ISAC (Oriental Institute)", u:"https://isac.uchicago.edu/about/history-isac"},
   "Cochrane-Woods Art Center":        {t:"Art History dept — CWAC history", u:"https://arthistory.uchicago.edu/about/cwac"},
-  "Harper Memorial Library":          {t:"UChicago Heritage Map (year_built 1912)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Rosenwald Hall":                   {t:"UChicago Library — Julius Rosenwald exhibit (built 1915)", u:"https://www.lib.uchicago.edu/collex/exhibits/building-long-future/julius-rosenwald/"},
-  "Swift Hall":                       {t:"Divinity School — Swift Hall centennial (completed 1926)", u:"https://divinity.uchicago.edu/news/swift-hall-100"},
-  "Cobb Hall":                        {t:"First university building (1892) — UChicago Library", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/"},
-  "Social Science Research Building": {t:"Laura Spelman Rockefeller Memorial / SSRB", u:"https://resource.rockarch.org/story/history-of-laura-spelman-rockefeller-memorial-legitimizing-social-sciences-1920s/"},
-  "Saieh Hall for Economics":         {t:"UChicago Heritage Map", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Judd Hall":                        {t:"Facilities — Reusing Judd Hall's Finials (built 1931)", u:"https://facilities.uchicago.edu/about/facilities_focus/archive/reusing_judd_halls_finials/"},
-  "Green Hall":                       {t:"UChicago Heritage Map (year_built 1898)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Pick Hall":                        {t:"UChicago Heritage Map (year_built 1971)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Stuart Hall":                      {t:"UChicago Heritage Map (year_built 1940)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Classics Building":                {t:"UChicago Heritage Map (year_built 1915)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Goodspeed Hall":                   {t:"UChicago Heritage Map (year_built 1892)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Foster Hall":                      {t:"UChicago Heritage Map (year_built 1893)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Wieboldt Hall":                    {t:"UChicago Heritage Map (year_built 1928)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Crown Family School of Social Work, Policy, and Practice":{t:"UChicago Heritage Map (year_built 1963)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Joseph Regenstein Library":        {t:"UChicago Library — GLS Records finding aid ICU.SPCL.GRADLIBRARY", u:"https://www.lib.uchicago.edu/e/scrc/findingaids/view.php?eadid=ICU.SPCL.GRADLIBRARY"},
+  "Wieboldt Hall":                    {t:"UChicago Facilities Heritage Survey — Wieboldt Hall (D40)", u:"../GIS/heritage_pdfs/Heritage_Survey_D40_Wieboldt_Hall.pdf"},
+  "Classics Building":                {t:"UChicago Facilities Heritage Survey — Classics Building (D41)", u:"../GIS/heritage_pdfs/Heritage_Survey_D41_Classics_Building.pdf"},
+  "Goodspeed Hall":                   {t:"UChicago Facilities Heritage Survey — Goodspeed Hall (D42)", u:"../GIS/heritage_pdfs/Heritage_Survey_D42_Goodspeed_Hall.pdf"},
+  "Foster Hall":                      {t:"UChicago Facilities Heritage Survey — Foster Hall (D35)", u:"../GIS/heritage_pdfs/Heritage_Survey_D35_Foster_Hall.pdf"},
+  "Stuart Hall":                      {t:"UChicago Facilities Heritage Survey — Stuart Hall (D37)", u:"../GIS/heritage_pdfs/Heritage_Survey_D37_Stuart_Hall.pdf"},
+  // ── Divinity ───────────────────────────────────────────────────────────
+  "Swift Hall":                       {t:"UChicago Facilities Heritage Survey — Swift Hall (D23)", u:"../GIS/heritage_pdfs/Heritage_Survey_D23_Swift_Hall.pdf"},
+  // ── Social Sciences ────────────────────────────────────────────────────
+  "Social Science Research Building": {t:"UChicago Facilities Heritage Survey — Social Science Research Building (D36, 2012)", u:"../GIS/heritage_pdfs/Heritage_Survey_D36_Social_Science_Research_Building.pdf"},
+  "Green Hall":                       {t:"UChicago Facilities Heritage Survey — Green Hall (D33)", u:"../GIS/heritage_pdfs/Heritage_Survey_D33_Green_Hall.pdf"},
+  "Pick Hall":                        {t:"UChicago Facilities Heritage Survey — Pick Hall (D53)", u:"../GIS/heritage_pdfs/Heritage_Survey_D53_Pick_Hall.pdf"},
+  "Judd Hall":                        {t:"UChicago Library guide — Education Library located in Judd Hall with the Department of Education", u:"https://guides.lib.uchicago.edu/c.php?g=297396&p=1992108"},
+  "Crown Family School of Social Work, Policy, and Practice":{t:"UChicago Facilities Heritage Survey — Social Service Administration", u:"../GIS/heritage_pdfs/Heritage_Social_Service_Administration.pdf"},
   "5740 South Woodlawn Avenue":       {t:"CEHD building history — cehd.uchicago.edu", u:"https://cehd.uchicago.edu/?page_id=12"},
-  "Booth School of Business":         {t:"UChicago Heritage Map (year_built 2004)", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  "Keller Center":                    {t:"Harris School founded 1988 — harris.uchicago.edu", u:"https://harris.uchicago.edu"},
-  "William Eckhardt Research Center": {t:"PME est. 2011; WERC opened 2015 — pme.uchicago.edu", u:"https://pme.uchicago.edu"},
+  // ── Professional Schools ───────────────────────────────────────────────
+  "Booth School of Business":         {t:"UChicago Facilities Heritage Survey — Charles M. Harper Center (E44, 2012)", u:"../GIS/heritage_pdfs/Heritage_Survey_E44_Charles_M._Harper_Center.pdf"},
+  "Saieh Hall for Economics":         {t:"UChicago Facilities Heritage Survey — 5757 South University Ave (O36)", u:"../GIS/heritage_pdfs/Heritage_Survey_O36_5757_South_University.pdf"},
+  "Keller Center":                    {t:"Keller Center — Explore the architecture at UChicago", u:"https://architecture.uchicago.edu/locations/keller_center/"},
+  "Joseph Regenstein Library":        {t:"Joseph Regenstein Library — Explore the architecture at UChicago", u:"https://architecture.uchicago.edu/locations/joseph_regenstein_library/"},
 };
 
 // Dept-specific source links (beyond what BLDG_SOURCES covers)
 const DEPT_SOURCES = {
-  "Chemistry":     [{t:"UChicago Library 'A Bold Experiment'", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/"}],
+  "Chemistry":     [{t:"UChicago Library 'A Bold Experiment' — Kent Chemical Laboratory", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/chemistry/kent-chemical-laboratory/"}],
   "Physics":       [{t:"UChicago Physics — Ryerson Laboratory history", u:"https://physics.uchicago.edu/about/our-history/ryerson-laboratory/"},
-                    {t:"UChicago Library 'A Bold Experiment'", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/"}],
-  "Astronomy and Astrophysics": [{t:"UChicago Library 'A Bold Experiment'", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/"}],
+                    {t:"UChicago Library 'A Bold Experiment' — Ryerson Physical Laboratory", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/physics/ryerson-physical-laboratory/"}],
+  "Astronomy and Astrophysics": [{t:"UChicago Library 'A Bold Experiment' — Department of Astronomy", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/astronomy/"}],
   "Mathematics":   [{t:"UChicago Library — Eckhart Hall exhibit", u:"https://www.lib.uchicago.edu/collex/exhibits/ryerson-physical-laboratory-and-eckhart-hall/eckhart-hall/"}],
   "Biochemistry and Molecular Biology": [
-    {t:"UCM Facilities — Hull Court Complex (Zoology Building, 1897)", u:"https://ucmfacilities.uchicago.edu/construction/project_archive/hull_court_complex/"},
     {t:"UChicago Graduate Catalogs 1960–1994 (UChicago Library Archives) — Biophysics Committee"},
   ],
   "Ecology and Evolution": [
-    {t:"UCM Facilities — Hull Court Complex", u:"https://ucmfacilities.uchicago.edu/construction/project_archive/hull_court_complex/"},
     {t:"UChicago Graduate Catalogs 1974–1994 — Committee on Biophysics and Theoretical Biology"},
   ],
-  "Microbiology":  [{t:"UChicago Library 'A Bold Experiment'", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/"}],
-  "Geophysical Sciences": [{t:"UChicago Library 'A Bold Experiment'", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/"}],
+  "Microbiology":  [{t:"UChicago Library 'A Bold Experiment' — Edwin O. Jordan and bacteriology", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/biology/edwin-o-jordan/"}],
+  "Geophysical Sciences": [{t:"UChicago Library 'A Bold Experiment' — Department of Geology", u:"https://www.lib.uchicago.edu/collex/exhibits/bold-experiment-origins-sciences-university-chicago/geology/"}],
   "Near Eastern Languages and Civilizations": [{t:"History of ISAC (Oriental Institute)", u:"https://isac.uchicago.edu/about/history-isac"}],
   "Art History":   [{t:"Art History dept — CWAC history", u:"https://arthistory.uchicago.edu/about/cwac"}],
-  "Linguistics":   [{t:"UChicago Library — Julius Rosenwald exhibit", u:"https://www.lib.uchicago.edu/collex/exhibits/building-long-future/julius-rosenwald/"}],
+  "Linguistics":   [],
   "Divinity":      [{t:"Divinity School — Swift Hall centennial", u:"https://divinity.uchicago.edu/news/swift-hall-100"}],
   "Economics":     [{t:"Laura Spelman Rockefeller Memorial / SSRB history", u:"https://resource.rockarch.org/story/history-of-laura-spelman-rockefeller-memorial-legitimizing-social-sciences-1920s/"}],
-  "Education":     [{t:"Facilities Services — Reusing Judd Hall's Finials", u:"https://facilities.uchicago.edu/about/facilities_focus/archive/reusing_judd_halls_finials/"}],
-  "Anthropology":  [{t:"History of ISAC — Haskell Hall transition", u:"https://isac.uchicago.edu/about/history-isac"}],
+  "Education":     [{t:"UChicago Library guide — Education Library in Judd Hall with the Department of Education", u:"https://guides.lib.uchicago.edu/c.php?g=297396&p=1992108"}],
+  "Anthropology": [
+    {t:"History of ISAC (Oriental Institute) — Haskell Hall transition 1932", u:"https://isac.uchicago.edu/about/history-isac"},
+  ],
   "Graduate Library School": [
     {t:"Wikipedia — University of Chicago Graduate Library School", u:"https://en.wikipedia.org/wiki/University_of_Chicago_Graduate_Library_School"},
     {t:"UChicago Library — GLS Records, 1928–1979 (ICU.SPCL.GRADLIBRARY)", u:"https://www.lib.uchicago.edu/e/scrc/findingaids/view.php?eadid=ICU.SPCL.GRADLIBRARY"},
@@ -3449,116 +3810,48 @@ const DEPT_SOURCES = {
   "Home Economics": [
     {t:"UChicago Library — 'Household as a Subject of Academic Study'", u:"https://www.lib.uchicago.edu/collex/exhibits/recipes-domesticity/household-subject-academic-study/"},
     {t:"CEHD building history — 5740 S. Woodlawn used from 1929", u:"https://cehd.uchicago.edu/?page_id=12"},
-    {t:"Harris School — Center for Economics of Human Development", u:"https://harris.uchicago.edu/research-impact/centers-institutes/center-for-the-economics-of-human-development"},
   ],
-  "Statistics": [
-    {t:"Department of Statistics — stat.uchicago.edu", u:"https://stat.uchicago.edu"},
-    {t:"UChicago Library — Eckhart/Ryerson exhibit (Jones Laboratory, 1929)", u:"https://www.lib.uchicago.edu/collex/exhibits/ryerson-physical-laboratory-and-eckhart-hall/eckhart-hall/"},
-  ],
-  "Computer Science": [
-    {t:"Department of Computer Science — cs.uchicago.edu", u:"https://cs.uchicago.edu"},
-    {t:"UChicago Heritage Map — John Crerar Library year_built 1984", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "Molecular Engineering": [
-    {t:"Pritzker School of Molecular Engineering — pme.uchicago.edu", u:"https://pme.uchicago.edu"},
-    {t:"UChicago Heritage Map — William Eckhardt Research Center year_built 2015", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "Genetics Genomics and Systems Biology": [
-    {t:"GGSB — ggsb.uchicago.edu", u:"https://ggsb.uchicago.edu"},
-    {t:"UCM Facilities — Hull Court Complex (Zoology Building, 1897)", u:"https://ucmfacilities.uchicago.edu/construction/project_archive/hull_court_complex/"},
-  ],
-  "Organismal Biology and Anatomy": [
-    {t:"OBA — oba.bsd.uchicago.edu", u:"https://oba.bsd.uchicago.edu"},
-    {t:"UCM Facilities — Hull Court Complex (Anatomy Building / Culver Hall, 1897)", u:"https://ucmfacilities.uchicago.edu/construction/project_archive/hull_court_complex/"},
-  ],
-  "Cinema and Media Studies": [
-    {t:"Department of Cinema and Media Studies — cms.uchicago.edu", u:"https://cms.uchicago.edu"},
-    {t:"UChicago Heritage Map — Wieboldt Hall year_built 1928", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "Classics": [
-    {t:"Department of Classics — classics.uchicago.edu", u:"https://classics.uchicago.edu"},
-    {t:"UChicago Heritage Map — Classics Building year_built 1915", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
+  "Statistics": [],
+  "Computer Science": [],
+  "Molecular Engineering": [],
+  "Genetics Genomics and Systems Biology": [],
+  "Organismal Biology and Anatomy": [],
+  "Cinema and Media Studies": [],
+  "Classics": [],
   "Comparative Literature": [
-    {t:"Department of Comparative Literature — complit.uchicago.edu", u:"https://complit.uchicago.edu"},
-    {t:"UChicago Heritage Map — Wieboldt Hall year_built 1928", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
+    {t:"Division of Humanities — CSL reorganized as Department of Comparative Literature in 1995", u:"https://humanities.uchicago.edu/about/programs/doctoral"},
   ],
-  "East Asian Languages and Civilizations": [
-    {t:"Department of East Asian Languages and Civilizations — ealc.uchicago.edu", u:"https://ealc.uchicago.edu"},
-    {t:"UChicago Heritage Map — Wieboldt Hall year_built 1928", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "English Language and Literature": [
-    {t:"Department of English Language and Literature — english.uchicago.edu", u:"https://english.uchicago.edu"},
-    {t:"UChicago Heritage Map — Harper Memorial Library year_built 1912", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "Germanic Studies": [
-    {t:"Department of Germanic Studies — german.uchicago.edu", u:"https://german.uchicago.edu"},
-    {t:"UChicago Heritage Map — Wieboldt Hall year_built 1928", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "Music": [
-    {t:"Department of Music — music.uchicago.edu", u:"https://music.uchicago.edu"},
-    {t:"UChicago Heritage Map — Goodspeed Hall year_built 1892", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "Philosophy": [
-    {t:"Department of Philosophy — philosophy.uchicago.edu", u:"https://philosophy.uchicago.edu"},
-    {t:"UChicago Heritage Map — Stuart Hall year_built 1940", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "Romance Languages and Literatures": [
-    {t:"Department of Romance Languages and Literatures — rll.uchicago.edu", u:"https://rll.uchicago.edu"},
-    {t:"UChicago Heritage Map — Foster Hall year_built 1893", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "Slavic Languages and Literatures": [
-    {t:"Department of Slavic Languages and Literatures — slavic.uchicago.edu", u:"https://slavic.uchicago.edu"},
-    {t:"UChicago Heritage Map — Wieboldt Hall year_built 1928", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "Social Thought": [
-    {t:"Committee on Social Thought — socialthought.uchicago.edu", u:"https://socialthought.uchicago.edu"},
-    {t:"UChicago Heritage Map — Wieboldt Hall year_built 1928", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "South Asian Languages and Civilizations": [
-    {t:"Department of South Asian Languages and Civilizations — salc.uchicago.edu", u:"https://salc.uchicago.edu"},
-    {t:"UChicago Heritage Map — Wieboldt Hall year_built 1928", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
+  "East Asian Languages and Civilizations": [],
+  "English Language and Literature": [],
+  "Germanic Studies": [],
+  "Music": [],
+  "Philosophy": [],
+  "Romance Languages and Literatures": [],
+  "Slavic Languages and Literatures": [],
+  "Social Thought": [],
+  "South Asian Languages and Civilizations": [],
   "Jewish Studies": [
-    {t:"Program in Jewish Studies — jewishstudies.uchicago.edu", u:"https://jewishstudies.uchicago.edu"},
     {t:"Divinity School — Swift Hall centennial (Swift Hall, 1926)", u:"https://divinity.uchicago.edu/news/swift-hall-100"},
   ],
-  "Comparative Human Development": [
-    {t:"Department of Comparative Human Development — humdev.uchicago.edu", u:"https://humdev.uchicago.edu"},
-    {t:"UChicago Heritage Map — Green Hall year_built 1898", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
+  "Comparative Human Development": [],
   "Conceptual and Historical Studies of Science": [
-    {t:"Conceptual and Historical Studies of Science — chss.uchicago.edu", u:"https://chss.uchicago.edu"},
     {t:"Laura Spelman Rockefeller Memorial / SSRB history", u:"https://resource.rockarch.org/story/history-of-laura-spelman-rockefeller-memorial-legitimizing-social-sciences-1920s/"},
   ],
   "History": [
-    {t:"Department of History — history.uchicago.edu", u:"https://history.uchicago.edu"},
     {t:"Laura Spelman Rockefeller Memorial / SSRB history (1929)", u:"https://resource.rockarch.org/story/history-of-laura-spelman-rockefeller-memorial-legitimizing-social-sciences-1920s/"},
   ],
   "Political Science": [
-    {t:"Department of Political Science — political-science.uchicago.edu", u:"https://political-science.uchicago.edu"},
-    {t:"UChicago Heritage Map — Pick Hall year_built 1971", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
     {t:"Note: 'International Relations' / 'Committee on International Relations' (1934–1965) corrected from Public Policy to Political Science after audit — pre-Harris IR committee was a social science unit"},
   ],
-  "Psychology": [
-    {t:"Department of Psychology — psychology.uchicago.edu", u:"https://psychology.uchicago.edu"},
-    {t:"UChicago Heritage Map — Green Hall year_built 1898", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
-  "Social Service Administration": [
-    {t:"Crown Family School of Social Work, Policy, and Practice — crownschool.uchicago.edu", u:"https://crownschool.uchicago.edu"},
-    {t:"UChicago Heritage Map — Crown Family School year_built 1963", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
+  "Psychology": [],
+  "Social Service Administration": [],
   "Sociology": [
-    {t:"Department of Sociology — sociology.uchicago.edu", u:"https://sociology.uchicago.edu"},
     {t:"Laura Spelman Rockefeller Memorial / SSRB — home of the Chicago School of Sociology since 1929", u:"https://resource.rockarch.org/story/history-of-laura-spelman-rockefeller-memorial-legitimizing-social-sciences-1920s/"},
   ],
-  "Business": [
-    {t:"Booth School of Business — chicagobooth.edu", u:"https://www.chicagobooth.edu"},
-    {t:"UChicago Heritage Map — Booth School of Business year_built 2004", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
-  ],
+  "Business": [],
   "Public Policy Studies": [
-    {t:"Harris School of Public Policy — harris.uchicago.edu", u:"https://harris.uchicago.edu"},
-    {t:"UChicago Heritage Map — Keller Center", u:"https://facilities.uchicago.edu/about/uchicago_heritage_map/"},
+    {t:"Harris — 1155 E. 60th St. and Keller Center move history", u:"https://harris.uchicago.edu/news-events/news/new-keller-center-reflects-harris-public-policys-growing-ambitions"},
+    {t:"Harris — Keller Center opened January 7, 2019", u:"https://harris.uchicago.edu/admissions/blog/spotlight-keller-center"},
     {t:"Note: 'Planning' / 'Committee on Planning' mapped here as pre-Harris urban planning predecessor; 'International Relations' corrected to Political Science"},
   ],
 };
@@ -3577,11 +3870,40 @@ function getDeptYearRange(deptName) {
   return mn < 9999 ? [mn, mx] : null;
 }
 
+// Building timelines sometimes begin before the canonical department existed,
+// especially when we map earlier dissertation labels into a modern unit.
+// Use explicit starts where we have them so the gantt bars don't backfill to
+// the construction date of a shared building.
+const DEPT_ACTIVE_START_OVERRIDES = {
+  // PhD programs not present from university founding — bar starts at dept establishment
+  "Art History":                          1938,  // first dissertation; formal dept est. 1930s
+  "Cinema and Media Studies":             2005,  // program established ~2005
+  "Comparative Literature":               1924,  // first dissertation; committee est. ~early 1920s
+  "Computer Science":                     1984,  // dept formally established 1984
+  "Conceptual and Historical Studies of Science": 1938,  // committee established 1938
+  "East Asian Languages and Civilizations": 1968,  // modern name/dept from ~1968
+  "Genetics Genomics and Systems Biology": 1965,  // modern genetics PhD program from 1965
+  "Jewish Studies":                       2008,  // PhD program from 2008
+  "Slavic Languages and Literatures":     1928,  // Modern Languages building opened 1928 (Heritage Survey D40)
+  "South Asian Languages and Civilizations": 1968,  // dept established 1966, first diss 1968
+  "Statistics":                           1929,  // Jones Laboratory opened 1929; Statistics independent of Math
+};
+
+function getDeptActiveStart(dept) {
+  if (typeof dept.activeStart === "number") return dept.activeStart;
+  if (DEPT_ACTIVE_START_OVERRIDES[dept.name] !== undefined) {
+    return DEPT_ACTIVE_START_OVERRIDES[dept.name];
+  }
+  return Math.min(...dept.buildings.map(era => era.from));
+}
+
 function drawDeptGantt() {
   const svg = document.getElementById("depts-gantt-svg");
   svg.innerHTML = "";
 
-  const YEAR_MIN = 1892, YEAR_MAX = 2025;
+  // Dissertation data ends in 2025; use 2026 as the display boundary so
+  // 2025-present department moves render as visible spans.
+  const YEAR_MIN = 1892, YEAR_MAX = 2026;
   const ROW_H = 24, DIV_HDR_H = 22, PAD_L = 190, PAD_R = 60, PAD_TOP = 10;
   const W = Math.max(700, (document.getElementById("depts-gantt-wrap").clientWidth || 800) - PAD_L - PAD_R - 20);
 
@@ -3656,7 +3978,13 @@ function drawDeptGantt() {
     const d = row.dept;
     const isSelected = _selectedDept === d.name;
     const color = DIV_COLORS[d.div];
+    const activeStart = getDeptActiveStart(d);
+    const activeEnd = d.activeEnd ?? YEAR_MAX;
     const isDissolved = d.activeEnd !== null;
+    const yr = getDeptYearRange(d.name);
+    // Bars span building occupancy timeline as defined in DEPT_HISTORY.
+    const barStart = Math.max(YEAR_MIN, activeStart);
+    const barEnd   = Math.min(YEAR_MAX, activeEnd);
     const rowMidY = curY + ROW_H / 2;
     const g = document.createElementNS("http://www.w3.org/2000/svg","g");
     g.style.cursor = "pointer";
@@ -3686,8 +4014,10 @@ function drawDeptGantt() {
     const barH = ROW_H * 0.55;
     const barY = curY + (ROW_H - barH) / 2;
     d.buildings.forEach((era, i) => {
-      const x1 = xScale(Math.max(YEAR_MIN, era.from));
-      const x2 = xScale(Math.min(YEAR_MAX, era.to === 9999 ? YEAR_MAX : era.to));
+      const segFrom = Math.max(barStart, era.from);
+      const segTo = Math.min(barEnd, era.to === 9999 ? YEAR_MAX : era.to);
+      const x1 = xScale(segFrom);
+      const x2 = xScale(segTo);
       if (x2 <= x1) return;
       const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
       rect.setAttribute("x", x1); rect.setAttribute("y", barY);
@@ -3714,19 +4044,16 @@ function drawDeptGantt() {
 
     // Dissertation count — always outside the bar, to the right
     const cnt = getDeptDissCount(d.name);
-    if (cnt > 0) {
-      const yr = getDeptYearRange(d.name);
-      if (yr) {
-        const ct = document.createElementNS("http://www.w3.org/2000/svg","text");
-        ct.setAttribute("x", xScale(Math.min(yr[1], YEAR_MAX)) + 6);
-        ct.setAttribute("y", rowMidY);
-        ct.setAttribute("dominant-baseline","middle");
-        ct.setAttribute("font-size","8");
-        ct.setAttribute("fill","#888");
-        ct.setAttribute("font-family","sans-serif");
-        ct.textContent = cnt.toLocaleString();
-        g.appendChild(ct);
-      }
+    if (cnt > 0 && yr) {
+      const ct = document.createElementNS("http://www.w3.org/2000/svg","text");
+      ct.setAttribute("x", xScale(barEnd) + 6);
+      ct.setAttribute("y", rowMidY);
+      ct.setAttribute("dominant-baseline","middle");
+      ct.setAttribute("font-size","8");
+      ct.setAttribute("fill","#888");
+      ct.setAttribute("font-family","sans-serif");
+      ct.textContent = cnt.toLocaleString();
+      g.appendChild(ct);
     }
 
     // Hover handlers
@@ -3780,13 +4107,11 @@ function showDeptCard(deptName) {
 
   // Building history with source links
   html += `<div class="card-section"><span class="card-section-label">Building history</span>
-    <table><tr><th>Era</th><th>Building</th><th>Source</th></tr>`;
+    <table><tr><th>Era</th><th>Building</th><th>Evidence</th></tr>`;
   d.buildings.forEach((era, i) => {
     const toLabel = era.to === 9999 ? "present" : era.to;
-    const s = BLDG_SOURCES[era.b];
-    const srcHtml = s
-      ? (s.u ? `<a href="${s.u}" target="_blank" style="color:#800000;">${escHtml(s.t)}</a>`
-             : escHtml(s.t))
+    const srcHtml = era.u
+      ? `<a href="${era.u}" target="_blank" style="color:#800000;">${escHtml(era.src)}</a>`
       : escHtml(era.src);
     html += `<tr${i%2===1 ? ' style="background:#faf7f5;"' : ''}>
       <td style="color:#888;white-space:nowrap;">${era.from}–${toLabel}</td>

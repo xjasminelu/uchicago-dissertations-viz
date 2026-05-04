@@ -638,7 +638,7 @@ def load_data():
         missing = [
             b for periods in DEPT_TIMELINE.values()
             for b in [p["building"] for p in periods]
-            if b not in footprint_geoms
+            if b not in footprint_geoms and GEOMETRY_ALIASES.get(b) not in footprint_geoms
         ]
         if missing:
             print(f"  WARNING: footprint missing buildings: {missing}")
@@ -659,23 +659,23 @@ def load_data():
 DEPT_OCCUPANCY_YEAR = {
     "Anthropology":                               1896,  # Haskell Hall 1896
     "Art History":                                1974,  # Cochrane-Woods 1974
-    "Astronomy and Astrophysics":                 1985,  # Kersten Physics 1985
+    "Astronomy and Astrophysics":                 2015,  # William Eckhardt Research Center 2015
     "Biochemistry and Molecular Biology":         2005,  # Gordon Center 2005
     "Business":                                   2004,  # Booth/Harper Center 2004
     "Chemistry":                                  1968,  # Searle Chemical Lab 1968
-    "Cinema and Media Studies":                   1928,  # Wieboldt Hall 1928
+    "Cinema and Media Studies":                   2005,  # Classics Building, program-era current office
     "Classics":                                   1915,  # Classics Building 1915
-    "Comparative Human Development":              1898,  # Green Hall 1898
-    "Comparative Literature":                     1928,  # Wieboldt Hall 1928
+    "Comparative Human Development":              1939,  # Rosenwald Hall current office
+    "Comparative Literature":                     1924,  # Walker Hall current office, earliest dataset record
     "Computer Science":                           1984,  # John Crerar Library 1984
     "Conceptual and Historical Studies of Science": 1929, # SSRB 1929
     "Divinity":                                   1926,  # Swift Hall 1926
     "East Asian Languages and Civilizations":     1928,  # Wieboldt Hall 1928
-    "Ecology and Evolution":                      1994,  # Donnelley Biological Sciences 1994
-    "Economics":                                  2009,  # Saieh Hall → Economics dept ~2009
+    "Ecology and Evolution":                      1897,  # Zoology Building 1897
+    "Economics":                                  2014,  # Saieh Hall renovation completed 2014
     "Education":                                  1931,  # Judd Hall 1931
-    "English Language and Literature":            1912,  # Harper Memorial Library 1912
-    "Genetics Genomics and Systems Biology":      2005,  # Gordon Center 2005
+    "English Language and Literature":            2025,  # Walker Hall current office
+    "Genetics Genomics and Systems Biology":      2005,  # Gordon Center for Integrative Science 2005 (GCIS dedication)
     "Geophysical Sciences":                       1969,  # Hinds Laboratory 1969
     "Germanic Studies":                           1928,  # Wieboldt Hall 1928
     "History":                                    1929,  # SSRB 1929
@@ -692,12 +692,12 @@ DEPT_OCCUPANCY_YEAR = {
     "Political Science":                          1971,  # Pick Hall 1971
     "Psychology":                                 1898,  # Green Hall 1898
     "Public Policy Studies":                      1988,  # Harris School founded 1988
-    "Romance Languages and Literatures":          1893,  # Foster Hall 1893
-    "Slavic Languages and Literatures":           1928,  # Wieboldt Hall 1928
+    "Romance Languages and Literatures":          1893,  # Cobb Hall pre-1928 (DEPT_TIMELINE); Wieboldt Hall 1928 (current, Heritage Survey D40)
+    "Slavic Languages and Literatures":           1928,  # Foster Hall current office
     "Social Service Administration":              1963,  # Crown Family School 1963
-    "Social Thought":                             1928,  # Wieboldt Hall 1928
+    "Social Thought":                             1941,  # Foster Hall current office
     "Sociology":                                  1929,  # SSRB 1929
-    "South Asian Languages and Civilizations":    1928,  # Wieboldt Hall 1928
+    "South Asian Languages and Civilizations":    1966,  # Foster Hall current office
     "Statistics":                                 1929,  # Jones Laboratory 1929
     "Graduate Library School":                    1926,  # Harper Memorial Library east wing, 1926
     "Home Economics":                             1929,  # 5740 S. Woodlawn Ave confirmed from 1929
@@ -705,14 +705,22 @@ DEPT_OCCUPANCY_YEAR = {
 
 
 # ---------------------------------------------------------------------------
-# Department building timeline — complete coverage for all 43 canonical depts.
+# Department building timeline — complete coverage for all 44 canonical depts.
 # Building names match exactly to uchicago-property-footprint-2-28-25.geojson
-# so geometries can be looked up.  "from": 0 means "from the university's
+# or to GEOMETRY_ALIASES below.  "from": 0 means "from the university's
 # founding" (no lower-bound anachronism warning).
 #
 # Sources: UChicago Library "Bold Experiment" exhibit, department histories,
 # UChicago Facilities, and footprint GeoJSON year_built fields.
 # ---------------------------------------------------------------------------
+
+GEOMETRY_ALIASES = {
+    # The GeoJSON has WERC and the demolished Research Institutes Building at
+    # 5640 S. Ellis, but no separate AAC polygon. Use the same site geometry.
+    "Astronomy and Astrophysics Center": "William Eckhardt Research Center",
+    # Department pages call this Walker Hall; the footprint canonical name is Walker Museum.
+    "Walker Hall": "Walker Museum",
+}
 
 DEPT_TIMELINE = {
 
@@ -720,40 +728,41 @@ DEPT_TIMELINE = {
     "Chemistry": [
         # Kent Chemical Lab opened 1894 for chemistry (gift of Sidney Kent).
         # Searle Chemical Laboratory completed 1968; chemistry relocated then.
-        {"from": 0,    "to": 1967, "building": "Kent Chemical Laboratory"},
+        {"from": 1894,    "to": 1967, "building": "Kent Chemical Laboratory"},
         {"from": 1968, "to": 9999, "building": "Searle Chemical Laboratory"},
     ],
     "Physics": [
         # Ryerson Physical Laboratory (1894) housed physics until Kersten (1985).
-        {"from": 0,    "to": 1984, "building": "Ryerson Laboratory"},
+        {"from": 1894,    "to": 1984, "building": "Ryerson Laboratory"},
         {"from": 1985, "to": 9999, "building": "Kersten Physics Teaching Center"},
     ],
     "Astronomy and Astrophysics": [
         # Ryerson also housed Mathematical Astronomy (predecessor dept).
-        {"from": 0,    "to": 1984, "building": "Ryerson Laboratory"},
-        {"from": 1985, "to": 9999, "building": "Kersten Physics Teaching Center"},
+        {"from": 1894,    "to": 1984, "building": "Ryerson Laboratory"},
+        {"from": 1985, "to": 2014, "building": "Astronomy and Astrophysics Center"},
+        {"from": 2015, "to": 9999, "building": "William Eckhardt Research Center"},
     ],
     "Mathematics": [
         # Ryerson housed "physics and mathematics" from 1894 per UChicago Library.
         # Eckhart Hall built 1930 specifically for mathematics.
-        {"from": 0,    "to": 1929, "building": "Ryerson Laboratory"},
+        {"from": 1894,    "to": 1929, "building": "Ryerson Laboratory"},
         {"from": 1930, "to": 9999, "building": "Eckhart Hall"},
     ],
     "Statistics": [
         # Statistics grew from mathematics; shared Ryerson until Jones Lab (1929).
-        {"from": 0,    "to": 1928, "building": "Ryerson Laboratory"},
+        {"from": 1894,    "to": 1928, "building": "Ryerson Laboratory"},
         {"from": 1929, "to": 9999, "building": "Jones Laboratory"},
     ],
     "Computer Science": [
         # CS didn't exist as a separate dept until ~1984; Ryerson is the
-        # nearest pre-history home (math/physics building).
-        {"from": 0,    "to": 1983, "building": "Ryerson Laboratory"},
-        {"from": 1984, "to": 9999, "building": "John Crerar Library"},
+        # nearest pre-history home. CS moved to renovated Crerar in August 2018.
+        {"from": 1894,    "to": 2017, "building": "Ryerson Laboratory"},
+        {"from": 2018, "to": 9999, "building": "John Crerar Library"},
     ],
     "Geophysical Sciences": [
         # Walker Museum (1893) was built for geological sciences.
         # Hinds Laboratory opened 1969 for geophysical sciences.
-        {"from": 0,    "to": 1968, "building": "Walker Museum"},
+        {"from": 1893,    "to": 1968, "building": "Walker Museum"},
         {"from": 1969, "to": 9999, "building": "Hinds Laboratory"},
     ],
     "Molecular Engineering": [
@@ -763,12 +772,10 @@ DEPT_TIMELINE = {
 
     # ── BIOLOGICAL SCIENCES ────────────────────────────────────────────────
     "Ecology and Evolution": [
-        # Zoology Building (1897, Hull Biological Labs, Helen Culver gift).
-        # Committee on Biophysics and Theoretical Biology (1974–1994) was housed in
-        # Cummings Life Sciences Center; merged into Ecology and related BSD programs.
-        # Donnelley Biological Sciences Learning Center opened 1994.
-        # Sources: UChicago BSD history; CLSC history; Donnelley BSLC building record.
-        {"from": 0,    "to": 1972, "building": "Zoology Building"},
+        # Pre-Hull Court (1892-1896): Cobb Hall. Zoology Building opened 1897
+        # (Heritage Survey D05). Cummings opened 1973. BSLC (Donnelley) 1994.
+        {"from": 1892,    "to": 1896, "building": "Cobb Hall"},
+        {"from": 1897, "to": 1972, "building": "Zoology Building"},
         {"from": 1973, "to": 1993, "building": "Cummings Life Sciences Center"},
         {"from": 1994, "to": 9999, "building": "Donnelley Biological Sciences Learning Center"},
     ],
@@ -792,6 +799,7 @@ DEPT_TIMELINE = {
         {"from": 2005, "to": 9999, "building": "Gordon Center for Integrative Science"},
     ],
     "Genetics Genomics and Systems Biology": [
+        # Genetics predecessors in Zoology Building (Hull Court) until GCIS (2005).
         {"from": 0,    "to": 2004, "building": "Zoology Building"},
         {"from": 2005, "to": 9999, "building": "Gordon Center for Integrative Science"},
     ],
@@ -816,9 +824,11 @@ DEPT_TIMELINE = {
     ],
     "English Language and Literature": [
         # Cobb Hall (1892) was the first UChicago building; all humanities began there.
-        # Harper Memorial Library (1912) became the English dept home.
+        # Harper Memorial Library (1912) became the English dept home; current
+        # office evidence places the department in Walker Hall from 2025.
         {"from": 0,    "to": 1911, "building": "Cobb Hall"},
-        {"from": 1912, "to": 9999, "building": "Harper Memorial Library"},
+        {"from": 1912, "to": 2024, "building": "Harper Memorial Library"},
+        {"from": 2025, "to": 9999, "building": "Walker Hall"},
     ],
     "Classics": [
         {"from": 0,    "to": 1914, "building": "Cobb Hall"},
@@ -838,8 +848,11 @@ DEPT_TIMELINE = {
         {"from": 0,    "to": 9999, "building": "Goodspeed Hall"},
     ],
     "Romance Languages and Literatures": [
-        # Foster Hall (1893) — essentially co-founded with the university.
-        {"from": 0,    "to": 9999, "building": "Foster Hall"},
+        # Cobb Hall pre-Wieboldt. Wieboldt Hall (1928) built for Dept of Modern Languages
+        # (Heritage Survey D40). RLL website confirms Wieboldt Hall 205, 1050 E 59th.
+        # Foster Hall was a women's dormitory until 1963 (Heritage Survey D35).
+        {"from": 0,    "to": 1927, "building": "Cobb Hall"},
+        {"from": 1928, "to": 9999, "building": "Wieboldt Hall"},
     ],
     "Germanic Studies": [
         # Germanic/Teutonic Languages existed from 1892 founding; Cobb Hall
@@ -848,23 +861,32 @@ DEPT_TIMELINE = {
         {"from": 1928, "to": 9999, "building": "Wieboldt Hall"},
     ],
     "Comparative Literature": [
-        {"from": 0,    "to": 9999, "building": "Wieboldt Hall"},
+        # Cobb Hall pre-Wieboldt. Wieboldt Hall (1928) built for Modern Languages
+        # (Heritage Survey D40); Comparative Literature is a modern language program.
+        {"from": 0,    "to": 1927, "building": "Cobb Hall"},
+        {"from": 1928, "to": 9999, "building": "Wieboldt Hall"},
     ],
     "Cinema and Media Studies": [
-        {"from": 0,    "to": 9999, "building": "Wieboldt Hall"},
+        {"from": 2005, "to": 9999, "building": "Classics Building"},
     ],
     "East Asian Languages and Civilizations": [
         {"from": 0,    "to": 9999, "building": "Wieboldt Hall"},
     ],
     "Slavic Languages and Literatures": [
-        {"from": 0,    "to": 9999, "building": "Wieboldt Hall"},
+        # Wieboldt Hall (1928) built for Dept of Modern Languages (Heritage Survey D40).
+        # Foster Hall converted from women's dorm to offices in 1963 (Heritage Survey D35).
+        {"from": 0,    "to": 1927, "building": "Cobb Hall"},
+        {"from": 1928, "to": 1962, "building": "Wieboldt Hall"},
+        {"from": 1963, "to": 9999, "building": "Foster Hall"},
     ],
     "South Asian Languages and Civilizations": [
-        {"from": 0,    "to": 9999, "building": "Wieboldt Hall"},
+        {"from": 1966, "to": 9999, "building": "Foster Hall"},
     ],
     "Social Thought": [
-        # Committee on Social Thought founded 1941; Wieboldt Hall from start.
-        {"from": 0,    "to": 9999, "building": "Wieboldt Hall"},
+        # Founded 1941 by Hutchins. Foster Hall was a women's dorm until 1963 renovation
+        # (Heritage Survey D35), so pre-1963 home was Cobb Hall.
+        {"from": 1941, "to": 1962, "building": "Cobb Hall"},
+        {"from": 1963, "to": 9999, "building": "Foster Hall"},
     ],
 
     # ── DIVINITY ───────────────────────────────────────────────────────────
@@ -893,10 +915,10 @@ DEPT_TIMELINE = {
     ],
     "Economics": [
         # Political Economy (early name for economics) from 1892 in Cobb Hall.
-        # SSRB (1929) housed economics; Saieh Hall for Economics opened ~2009.
+        # SSRB (1929) housed economics; Saieh Hall renovation completed 2014.
         {"from": 0,    "to": 1928, "building": "Cobb Hall"},
-        {"from": 1929, "to": 2008, "building": "Social Science Research Building"},
-        {"from": 2009, "to": 9999, "building": "Saieh Hall for Economics"},
+        {"from": 1929, "to": 2013, "building": "Social Science Research Building"},
+        {"from": 2014, "to": 9999, "building": "Saieh Hall for Economics"},
     ],
     "Political Science": [
         # Social/political science in Cobb Hall, then SSRB (1929), then
@@ -911,19 +933,19 @@ DEPT_TIMELINE = {
         {"from": 1929, "to": 9999, "building": "Social Science Research Building"},
     ],
     "Anthropology": [
-        # Haskell Hall (1896) is Anthropology's current home. The building was
-        # originally Haskell Oriental Museum (NELC); Anthropology moved in
-        # after NELC vacated for ISAC (1932). Pre-1932: Cobb Hall.
+        # Cobb Hall until NELC vacated Haskell (1932). Walker Museum 1932-1978
+        # (Anthropology surrendered Walker for Haskell in 1979 per Heritage Survey D39).
         {"from": 0,    "to": 1931, "building": "Cobb Hall"},
-        {"from": 1932, "to": 9999, "building": "Haskell Hall"},
+        {"from": 1932, "to": 1978, "building": "Walker Museum"},
+        {"from": 1979, "to": 9999, "building": "Haskell Hall"},
     ],
     "Psychology": [
         # Green Hall (1898) — Psychology's long-standing home.
         {"from": 0,    "to": 9999, "building": "Green Hall"},
     ],
     "Comparative Human Development": [
-        # CHD committee shares Green Hall with Psychology.
-        {"from": 0,    "to": 9999, "building": "Green Hall"},
+        # Current department offices are in Rosenwald Hall.
+        {"from": 1939, "to": 9999, "building": "Rosenwald Hall"},
     ],
     "Education": [
         {"from": 0,    "to": 1930, "building": "Cobb Hall"},
@@ -941,8 +963,12 @@ DEPT_TIMELINE = {
         {"from": 1988, "to": 9999, "building": "Keller Center"},
     ],
     "Business": [
-        # GSB founded 1898 in Rosenwald Hall era; Booth building opened 2004.
-        {"from": 0,    "to": 2003, "building": "Rosenwald Hall"},
+        # Cobb Hall (1898-1958). Stuart Hall 1959-1970 (Heritage Survey D37).
+        # Rosenwald Hall 1971-2003 (Heritage Survey D24: "turned over to GSB in 1971").
+        # Booth (Harper Center) from 2004 (Heritage Survey E44).
+        {"from": 0,    "to": 1958, "building": "Cobb Hall"},
+        {"from": 1959, "to": 1970, "building": "Stuart Hall"},
+        {"from": 1971, "to": 2003, "building": "Rosenwald Hall"},
         {"from": 2004, "to": 9999, "building": "Booth School of Business"},
     ],
 
@@ -1031,6 +1057,9 @@ def build_campus_data(rows, dept_geo, locations, footprint_geoms):
     for bname, geom in footprint_geoms.items():
         if bname not in bldg_geom:
             bldg_geom[bname] = geom
+    for alias, canonical in GEOMETRY_ALIASES.items():
+        if canonical in bldg_geom and alias not in bldg_geom:
+            bldg_geom[alias] = bldg_geom[canonical]
 
     all_years: set = set()
     features = []

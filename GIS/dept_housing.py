@@ -9,7 +9,7 @@ This script performs two sequential join operations:
 
   Step 1. Normalize raw dissertation department strings → modern department names
           Source: extended-annotated.csv (Department column)
-          Target: uchicago_locations.csv (31 canonical modern departments)
+          Target: uchicago_locations.csv (44 canonical departments)
           Output: dissertations_with_departments.csv
 
   Step 2. Join modern departments → building polygons
@@ -48,14 +48,12 @@ GIS/processed/unmapped_departments.txt for manual review.
 
 Building name correction table
 -------------------------------
-Seven building names in uchicago_locations.csv do not exactly match the
+Five building names in uchicago_locations.csv do not exactly match the
 canonical names in the geojson property footprint file. Corrections:
 
   "Searle Chemistry Laboratory"         → "Searle Chemical Laboratory"
-  "Biological Sciences Learning Center" → "Donnelley Biological Sciences
-                                           Learning Center"
+  "Walker Hall"                         → "Walker Museum"
   "Social Sciences Research Building"   → "Social Science Research Building"
-  "Cummings Life Science Center"        → "Cummings Life Sciences Center"
   "Oriental Institute"                  → "Institute for the Study of Ancient
                                            Cultures"  (building renamed 2019)
   "Crown Family School"                 → "Crown Family School of Social Work,
@@ -1031,9 +1029,8 @@ def normalize_department(raw):
 BUILDING_NAME_CORRECTIONS = {
     # uchicago_locations.csv name          → geojson canonical name
     "Searle Chemistry Laboratory":         "Searle Chemical Laboratory",
-    "Biological Sciences Learning Center": "Donnelley Biological Sciences Learning Center",
+    "Walker Hall":                         "Walker Museum",
     "Social Sciences Research Building":   "Social Science Research Building",
-    "Cummings Life Science Center":        "Cummings Life Sciences Center",
     # Oriental Institute was renamed in 2019 following a faculty vote.
     "Oriental Institute":                  "Institute for the Study of Ancient Cultures",
     # Crown Family School: locations CSV uses shortened name.
