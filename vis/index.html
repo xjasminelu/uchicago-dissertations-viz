@@ -2103,11 +2103,10 @@ let _campusPixelPos    = {};    // dept → [canvasX, canvasY] via Leaflet proje
 let _computedRingOrder = null;  // JS-recomputed ring order (non-crossing on campus map)
 let _ringPeriodData    = null;  // active ring matrix/order for current period
 
-// Ring tour: angular sort around campus center → 2-opt improvement.
-// Angular sort guarantees a consistent clockwise sweep around campus so the
-// ring always looks like a geographic loop.  2-opt then fixes any local
-// crossings that arise from buildings at similar angles without breaking the
-// overall circular layout.
+// Ring tour: group same-building depts → nearest-neighbour tour of buildings
+// → 2-opt cleanup → flatten.
+// No CW constraint — just connect each building to its geographic nearest
+// neighbour. Same-building depts stay consecutive as atomic units.
 const CAMPUS_CTR = [41.7890, -87.5993];
 
 function computeRingOrderFromCentroid(rs, deptSubset) {
@@ -2117,45 +2116,96 @@ function computeRingOrderFromCentroid(rs, deptSubset) {
 
   const pos = d => rs.locations[d] || [0, 0];
 
-  // Clockwise angle from north, campus-center origin.
-  function angle(d) {
-    const [lat, lon] = pos(d);
-    const dlat = lat - CAMPUS_CTR[0];
-    const dlon = (lon - CAMPUS_CTR[1]) * Math.cos(CAMPUS_CTR[0] * Math.PI / 180);
-    return (Math.atan2(dlon, dlat) * 180 / Math.PI + 360) % 360;
+  // Step 1: group by building name → mean centroid per group.
+  const bldgKey = d => rs.buildings?.[d] ?? pos(d).map(v => v.toFixed(5)).join(',');
+  const groupMap = {};
+  for (const d of depts) {
+    const k = bldgKey(d);
+    if (!groupMap[k]) groupMap[k] = { depts: [] };
+    groupMap[k].depts.push(d);
+  }
+  for (const g of Object.values(groupMap)) {
+    g.depts.sort();
+    g.lat = g.depts.reduce((s, d) => s + pos(d)[0], 0) / g.depts.length;
+    g.lon = g.depts.reduce((s, d) => s + pos(d)[1], 0) / g.depts.length;
+  }
+  const groups = Object.values(groupMap);
+  if (groups.length < 2) return groups.flatMap(g => g.depts);
+
+  const gDist = (a, b) => {
+    const cosLat = Math.cos((a.lat + b.lat) / 2 * Math.PI / 180);
+    return Math.sqrt(((b.lat-a.lat)*111320)**2 + ((b.lon-a.lon)*111320*cosLat)**2);
+  };
+
+  // Step 2: nearest-neighbour from every building as start; keep shortest tour.
+  // Trying all starts avoids the single-start greedy trap.
+  const n = groups.length;
+  let tour = [], bestLen = Infinity;
+
+  for (let s = 0; s < n; s++) {
+    const vis = new Array(n).fill(false);
+    const t = [groups[s]];
+    vis[s] = true;
+    while (t.length < n) {
+      const last = t[t.length - 1];
+      let ni = -1, nd = Infinity;
+      for (let i = 0; i < n; i++) {
+        if (vis[i]) continue;
+        const d = gDist(last, groups[i]);
+        if (d < nd) { nd = d; ni = i; }
+      }
+      vis[ni] = true;
+      t.push(groups[ni]);
+    }
+    const len = t.reduce((sum, g, i) => sum + gDist(g, t[(i + 1) % n]), 0);
+    if (len < bestLen) { bestLen = len; tour = t.slice(); }
   }
 
-  // Flat-Earth distance in metres.
-  function distM(a, b) {
-    const [la, loa] = pos(a), [lb, lob] = pos(b);
-    const cosLat = Math.cos((la + lb) / 2 * Math.PI / 180);
-    const dy = (lb - la) * 111320;
-    const dx = (lob - loa) * 111320 * cosLat;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
+  // Steps 3+4: alternate 2-opt and Or-opt until neither finds improvement.
+  // Or-opt moves can open new 2-opt opportunities and vice versa.
+  let anyImproved = true;
+  while (anyImproved) {
+    anyImproved = false;
+    const m = tour.length;
 
-  // Step 1: angular sort — gives a consistent clockwise campus loop.
-  const tour = [...depts].sort((a, b) => angle(a) - angle(b));
-
-  // Step 2: 2-opt improvement — eliminates crossings from buildings at
-  // similar angles without reversing the overall clockwise direction.
-  let improved = true;
-  while (improved) {
-    improved = false;
-    const n = tour.length;
-    for (let i = 0; i < n - 1; i++) {
-      for (let j = i + 2; j < n; j++) {
-        const dOld = distM(tour[i], tour[i + 1]) + distM(tour[j], tour[(j + 1) % n]);
-        const dNew = distM(tour[i], tour[j])     + distM(tour[i + 1], tour[(j + 1) % n]);
+    // 2-opt pass: reverse a segment when it shortens the tour.
+    for (let i = 0; i < m - 1; i++) {
+      for (let j = i + 2; j < m; j++) {
+        if (i === 0 && j === m - 1) continue;
+        const dOld = gDist(tour[i], tour[i+1]) + gDist(tour[j], tour[(j+1)%m]);
+        const dNew = gDist(tour[i], tour[j])   + gDist(tour[i+1], tour[(j+1)%m]);
         if (dNew < dOld - 0.5) {
           let lo = i + 1, hi = j;
           while (lo < hi) { [tour[lo], tour[hi]] = [tour[hi], tour[lo]]; lo++; hi--; }
-          improved = true;
+          anyImproved = true;
+        }
+      }
+    }
+
+    // Or-opt pass: relocate each building to a cheaper position.
+    outer: for (let i = 0; i < tour.length; i++) {
+      const m2 = tour.length;
+      const ip = (i - 1 + m2) % m2, inx = (i + 1) % m2;
+      const removeSave = gDist(tour[ip], tour[i]) + gDist(tour[i], tour[inx])
+                       - gDist(tour[ip], tour[inx]);
+      for (let j = 0; j < m2; j++) {
+        if (j === ip || j === i) continue;
+        const jn = (j + 1) % m2;
+        if (jn === i) continue;
+        const insertCost = gDist(tour[j], tour[i]) + gDist(tour[i], tour[jn])
+                         - gDist(tour[j], tour[jn]);
+        if (removeSave - insertCost > 0.5) {
+          const [node] = tour.splice(i, 1);
+          tour.splice(j < i ? j + 1 : j, 0, node);
+          anyImproved = true;
+          break outer;
         }
       }
     }
   }
-  return tour;
+
+  // Step 5: flatten — same-building depts are consecutive.
+  return tour.flatMap(g => g.depts);
 }
 
 function getRingSimDataForYear(rs, year) {
