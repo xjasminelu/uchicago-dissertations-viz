@@ -1039,6 +1039,129 @@ BUILDING_NAME_CORRECTIONS = {
     "Harper Center":                       "Booth School of Business",
 }
 
+def div_match(department):
+
+    DIVISION_DEPARTMENT_MATCH = {
+
+    "Ecology and Evolution": "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    "Biology": "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    "Biophysical Sciences": "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    "Cancer Biology": "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    "Cell and Molecular Biology": "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    "Computational Neuroscience": "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Development, Regeneration, and Stem Cell Biology':"DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Evolutionary Biology':"DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    "Genetics, Genomics, and Systems Biology": "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    "Genetics Genomics and Systems Biology": "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Human Genetics': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Immunology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    
+    'Interdisciplinary Scientist Training Program: Biochemistry and Molecular Biology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Biochemistry and Molecular Biophysics': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Biophysical Sciences': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Cancer Biology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Chemistry': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Computational Neuroscience': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Ecology and Evolution': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Development, Regeneration, and Stem Cell Biology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Genetics, Genomics, and Systems Biology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Immunology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Human Genetics': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Integrative Neuroscience': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Microbiology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Molecular Metabolism and Nutrition': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Public Health Sciences': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Molecular Engineering': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Interdisciplinary Scientist Training Program: Neurobiology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    
+
+    'Integrative Biology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Medical Physics': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Microbiology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Molecular Metabolism and Nutrition': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Molecular Genetics and Cell Biology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Neurobiology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Organismal Biology and Anatomy': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Public Health Sciences':"DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Biochemistry and Molecular Biophysics':"DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+    'Biochemistry and Molecular Biology': "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE",
+
+    "Anthropology": "DIVISION OF SOCIAL SCIENCES",
+    "Anthropology and Linguistics": "DIVISION OF SOCIAL SCIENCES",
+    "Economics": "DIVISION OF SOCIAL SCIENCES",
+    "Economics and Business": "DIVISION OF SOCIAL SCIENCES",
+    "Education": "DIVISION OF SOCIAL SCIENCES",
+    "Comparative Human Development": "DIVISION OF SOCIAL SCIENCES",
+    "Comparative Human Development and Psychology": "DIVISION OF SOCIAL SCIENCES",
+    "Comparative Human Development and Sociology": "DIVISION OF SOCIAL SCIENCES",
+    "Conceptual and Historical Studies of Science": "DIVISION OF SOCIAL SCIENCES",
+    "Conceptual and Historical Studies of Science and Philosophy": "DIVISION OF SOCIAL SCIENCES",
+    
+    "History": "DIVISION OF SOCIAL SCIENCES",
+    "Political Science": "DIVISION OF SOCIAL SCIENCES",
+    'Political Science and Slavic Languages and Literatures': "DIVISION OF SOCIAL SCIENCES",
+    'Political Science and Anthropology': "DIVISION OF SOCIAL SCIENCES",
+    "Psychology": "DIVISION OF SOCIAL SCIENCES",
+    "Psychology and Business": "DIVISION OF SOCIAL SCIENCES",
+    "Sociology": "DIVISION OF SOCIAL SCIENCES",
+    "Sociology and Business": "DIVISION OF SOCIAL SCIENCES",
+
+    "Physics": "DIVISION OF PHYSICAL SCIENCES",
+    'Computational and Applied Mathematics': "DIVISION OF PHYSICAL SCIENCES",
+    "Computer Science": "DIVISION OF PHYSICAL SCIENCES",
+    "Computer Science and Mathematics": "DIVISION OF PHYSICAL SCIENCES",
+    "Geophysical Sciences": "DIVISION OF PHYSICAL SCIENCES",
+    "Mathematics": "DIVISION OF PHYSICAL SCIENCES",
+    "Chemistry": "DIVISION OF PHYSICAL SCIENCES",
+    "Statistics": "DIVISION OF PHYSICAL SCIENCES",
+    'Astronomy and Astrophysics': "DIVISION OF PHYSICAL SCIENCES",
+
+    "South Asian Languages and Civilizations": "DIVISION OF HUMANITIES",
+    "Art History": "DIVISION OF HUMANITIES",
+    "English Language and Literature": "DIVISION OF HUMANITIES",
+    "Cinema and Media Studies": "DIVISION OF HUMANITIES",
+    "Comparative Literature": "DIVISION OF HUMANITIES",
+    'East Asian Languages and Civilizations': "DIVISION OF HUMANITIES",
+    "Germanic Studies": "DIVISION OF HUMANITIES",
+    "Linguistics": "DIVISION OF HUMANITIES",
+    "Music": "DIVISION OF HUMANITIES",
+    'Music and Theater and Performance Studies': 'DIVISION OF HUMANITIES',
+    'Near Eastern Languages and Civilizations': "DIVISION OF HUMANITIES",
+    "South Asian Languages and Civilizations and English Language and Literature": "DIVISION OF HUMANITIES",
+    "South Asian Languages and Civilizations and History": "DIVISION OF HUMANITIES",
+    'Philosophy': "DIVISION OF HUMANITIES",
+    'Romance Languages and Literatures': "DIVISION OF HUMANITIES",
+    'Classical Languages and Literatures': "DIVISION OF HUMANITIES",
+    'Classics': "DIVISION OF HUMANITIES",
+    'Classics and Social Thought': "DIVISION OF HUMANITIES",
+    "Social Thought": "DIVISION OF HUMANITIES",
+    "Social Thought and Philosophy": "DIVISION OF HUMANITIES",
+    'Slavic Languages and Literatures': "DIVISION OF HUMANITIES",
+
+    "Business": "BOOTH SCHOL OF  BUSINESS",
+    "Business and Economics": "BOOTH SCHOL OF  BUSINESS",
+    "Business and Psychology": "BOOTH SCHOL OF  BUSINESS",
+
+    "Divinity": "DIVINITY SCHOOL",
+    'Divinity and Near Eastern Languages and Civilizations': "DIVINITY SCHOOL",
+    "Jewish Studies": "DIVINITY SCHOOL",
+
+    "Social Service Administration": "SCHOOL OF SOCIAL SERVICE ADMINISTRATION",
+    "Social Work, Policy, and Practice": "CROWN FAMILY SCHOOL OF SOCIAL WORK, POLICY, AND PRACTICE",
+
+    "Molecular Engineering": "Molecular Engineering",
+
+    "Public Policy Studies": "IRVING B. HARRIS GRADUATE SCHOOL OF PUBLIC POLICY STUDIES",
+
+    '': '',
+    'UNKNOWN': ''
+    }
+    try:
+        match = DIVISION_DEPARTMENT_MATCH[department]
+    except:
+        match = DIVISION_DEPARTMENT_MATCH[DEPT_MAP[department]]
+    return match
+
 
 # ---------------------------------------------------------------------------
 # Main pipeline
@@ -1056,6 +1179,7 @@ def run():
 
     with open(DISSERTATIONS_CSV, newline="", encoding="utf-8") as f:
         diss_rows = list(csv.DictReader(f))
+
     print(f"  dissertations: {len(diss_rows):,} records")
 
     # Apply department overrides from fill_departments.py (if available)
@@ -1071,6 +1195,29 @@ def run():
                     row["Department"] = dept_overrides[goid]
                     applied += 1
         print(f"  dept_overrides applied: {applied:,} previously-empty records filled")
+
+    # Apply division overrides from fill_departments.py (if available)
+    overrides_path = Path(__file__).resolve().parent / "processed" / "div_overrides.json"
+    if overrides_path.exists():
+        with open(overrides_path, encoding="utf-8") as f:
+            divs_overrides = json.load(f)
+        applied = 0
+
+        diss_rows2 = []
+
+        for row in diss_rows:
+            goid = str(row.get("GOID", ""))
+            row = dict(row, Division='')
+            if goid in divs_overrides:
+                row["Division"] = divs_overrides[goid]
+                applied += 1
+            else:
+                row["Division"] = div_match(row.get("Department"))
+            diss_rows2.append(row)
+
+        diss_rows = diss_rows2
+
+        print(f"  divs_overrides applied: {applied:,} previously-empty records filled")
 
     modern_depts = load_modern_departments(LOCATIONS_CSV)
     print(f"  modern departments: {len(modern_depts)}")
@@ -1231,6 +1378,7 @@ def run():
     for row in diss_rows:
         modern = row["modern_department"]
         match  = dept_to_feature.get(modern)
+
         if match:
             row["building_name"] = match["building_name"]
             row["has_geometry"]  = "True"
@@ -1253,7 +1401,7 @@ def run():
     # Determine output fieldnames: original columns + new columns
     original_fields = list(diss_rows[0].keys())
     new_fields = ["department_original", "modern_department",
-                  "building_name", "has_geometry"]
+                  "building_name", "has_geometry", "Division"]
     # Remove new fields from original list to avoid duplicates (they were
     # inserted into row dicts during processing)
     out_fields = [f for f in original_fields
@@ -1264,6 +1412,7 @@ def run():
                                 extrasaction="ignore")
         writer.writeheader()
         writer.writerows(diss_rows)
+
     print(f"  Written: {OUT_DISS_WITH_DEPTS}")
 
     # ------------------------------------------------------------------

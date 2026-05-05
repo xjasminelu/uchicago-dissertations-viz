@@ -34,6 +34,7 @@ VIS_DIR = ROOT / "vis"
 VIS_DIR.mkdir(exist_ok=True)
 
 IN_ENRICHED    = GIS_OUT / "dissertations_geo_enriched.csv"
+IN_DIV_DATA    = GIS_OUT / "dissertations_with_departments.csv"
 IN_DEPT_GEO    = GIS_OUT / "departments_with_buildings.geojson"
 IN_LOCATIONS   = ROOT / "uchicago_locations.csv"
 IN_FOOTPRINT   = ROOT / "uchicago-property-footprint-2-28-25.geojson"
@@ -647,6 +648,15 @@ def load_data():
         print("  WARNING: footprint GeoJSON not found — historical building mapping disabled")
 
     return rows, dept_geo, locations, footprint_geoms
+
+
+def load_div_data():
+    print("[LOAD] Reading source files...")
+    with open(IN_DIV_DATA, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    print(f"  division added dissertations: {len(rows):,}")
+
+    return rows
 
 
 # ---------------------------------------------------------------------------
@@ -1623,10 +1633,47 @@ def build_diss_index(rows):
     return {"byBuilding": dict(by_building), "byCountry": dict(by_country)}
 
 def write_diss_full(rows):
+
+    NORMALIZE_DIVISIONS = {
+        "DIVISION OF HUMANITIES" : "Division of the Arts and Humanities",
+        "DIVISION OF SOCIAL SCIENCES": "Social Sciences Division",
+        "BOOTH SCHOL OF  BUSINESS": "Chicago Booth School of Business",
+        "DIVINITY SCHOOL": "Divinity School",
+        "DIVISION OF BIOLOGICAL SCIENCES AND PRITZKER SCHOOL OF MEDICINE": "Biological Sciences Division",
+        "DIVISION OF PHYSICAL SCIENCES": "Physical Sciences Division",
+        "": "Unknown",
+        "THE DIVISION OF THE BIOLOGICAL SCIENCES": "Biological Sciences Division",
+        "THE DIVISION OF THE PHYSICAL SCIENCES": "Physical Sciences Division",
+        "THE DIVISION OF THE HUMANITIES": "Division of Humanities",
+        "THE DIVISION OF THE SOCIAL SCIENCES": "Division of the Arts and Humanities",
+        "THE DIVINITY SCHOOL": "Divinity School",
+        "THE PROFESSIONAL SCHOOLS": "Unknown",
+        "DIVISION OF BIOLOGICAL SCIENCES": "Biological Sciences Division",
+        "SCHOOL OF BUSINESS": "Chicago Booth School of Business",
+        "GRADUATE LIBRARY SCHOOL": "Graduate Library School",
+        "SCHOOL OF SOCIAL SERVICE ADMINISTRATION": "Crown Family School of Social Work, Policy, and Practice",
+        "GRADUATE DIVINITY SCHOOL": "Divinity School",
+        "SCHOOL OF COMMERCE AND ADMINISTRATION": "Unknown",
+        "GRADUATE SCHOOL OF BUSINESS": "Chicago Booth School of Business",
+        "COMMITTEE ON PUBLIC POLICY STUDIES": "Crown Family School of Social Work, Policy, and Practice",
+        "Molecular Engineering": "Pritzker School of Molecular Engineering",
+        "IRVING B. HARRIS GRADUATE SCHOOL OF PUBLIC POLICY STUDIES": "Harris School of Public Policy",
+        "CROWN FAMILY SCHOOL OF SOCIAL WORK, POLICY, AND PRACTICE": "Crown Family School of Social Work, Policy, and Practice",
+        "SCHOOL OF SOCIAL SERVICE  ADMINISTRATION": "Crown Family School of Social Work, Policy, and Practice",
+        "GRADUATE SCHOOL OF PUBLIC POLICY STUDIES": "Harris School of Public Policy",
+        "LAW SCHOOL": "Law School",
+        "BOOTH SCHOOL OF BUSINESS": "Chicago Booth School of Business",
+        "SCHOOL OF SOCIAL SERVICES ADMINISTRATION": "Crown Family School of Social Work, Policy, and Practice",
+        "DIVISION OF SOCIAL SCIENCES AND DIVISION OF HUMANITIES": "Division of the Arts and Humanities"
+
+    }
+
+    by_div = {}
+    by_dept = {}
     for row in rows:
-        dept = row.get("dept_raw", "").strip()
-        print(row)
-        input()
+        dept = row.get("modern_department", "").strip()
+        div = NORMALIZE_DIVISIONS[row.get("Division", "").strip()]
+
         date = row.get("Date", "") or ""
         try:
             year = int(date[:4])
@@ -1641,45 +1688,40 @@ def write_diss_full(rows):
         entry = {
             "t": title,
             "y": year or "",
-            "d": dept if dept not in ("UNKNOWN", "") else "",
+            "d": dept if dept not in ("UNKNOWN", "", div) else "",
+            "div": div,
             "a": author,
             "v": advisor,
             "g": goid,
         }
 
-        # ── Building index ──────────────────────────────────────────────────
-        if dept and dept != "UNKNOWN" and year:
-            bldg = get_historical_building(dept, year)
-            if not bldg and row.get("has_geometry") == "True":
-                bldg = row.get("building_name", "").strip()
-            if bldg:
-                by_building[bldg].append(entry)
+        if div in by_div.keys():
+            if entry['d'] in by_div[div].keys():
+                by_div[div][entry['d']]['entries'].append(entry)
+                by_div[div][entry['d']]['count'] += 1
+                by_div[div]['count'] += 1
+            else:
+                by_div[div][entry['d']] = {'count': 1, 'entries': [entry]}
+                by_div[div]['count'] += 1
 
-        # ── Country/geo index ───────────────────────────────────────────────
-        ge_raw = (row.get("geo_entities", "") or "").strip()
-        raw_ents = [e.strip() for e in ge_raw.split(";") if e.strip()] if ge_raw else []
-        if not raw_ents:
-            pg = (row.get("primary_geo", "") or "").strip()
-            if pg:
-                raw_ents = [pg]
+        else:
+            by_div[div] = {'count' : 1, entry['d']: {'count': 1, 'entries': [entry]}}
 
-        seen: set = set()
-        for ent in raw_ents:
-            country = normalize_country(ent)
-            if country and country not in seen:
-                seen.add(country)
-                by_country[country].append(entry)
+        if entry['d'] in by_dept.keys():
+            by_dept[entry['d']]['count'] += 1
+            by_dept[entry['d']]['entries'].append(entry)
+        else:
+            by_dept[entry['d']] = {'count': 1, 'entries': [entry]}
 
-    # Sort each list: most recent first
-    for lst in list(by_building.values()) + list(by_country.values()):
-        lst.sort(key=lambda x: -(x["y"] or 0))
+        
+    diss_full = {"byDivision": dict(by_div), "byDepartment": dict(by_dept)}
 
-    total_bldg = sum(len(v) for v in by_building.values())
-    total_geo  = sum(len(v) for v in by_country.values())
-    print(f"  Buildings indexed: {len(by_building)}, entries: {total_bldg:,}")
-    print(f"  Countries indexed: {len(by_country)}, entries: {total_geo:,}")
-
-    return {"byDivision": dict(by_building), "byAdvisor": dict(by_advisor)}
+    js_str = json.dumps(diss_full, separators=(",", ":"))
+    with open(OUT_DIS_FULL, "w", encoding="utf-8") as f:
+        f.write("// Auto-generated by GIS/prepare_viz_data.py — do not edit manually\n")
+        f.write(f"window.DISS_FULL= {js_str};\n")
+    size_kb = OUT_DIS_FULL.stat().st_size / 1024
+    print(f"  Written: {OUT_DIS_FULL} ({size_kb:.0f} KB)")
 
 def write_diss_index(diss_index):
     js_str = json.dumps(diss_index, separators=(",", ":"))
@@ -1761,6 +1803,7 @@ def run():
     print("=" * 70)
 
     rows, dept_geo, locations, footprint_geoms = load_data()
+    div_rows = load_div_data()
     campus            = build_campus_data(rows, dept_geo, locations, footprint_geoms)
     global_data       = build_global_data(rows)
     interdisciplinary = build_interdisciplinary_data(rows, locations)
@@ -1770,7 +1813,7 @@ def run():
     diss_index = build_diss_index(rows)
     write_diss_index(diss_index)
     build_world_js()
-    write_diss_full(rows)
+    write_diss_full(div_rows)
 
     print("\n" + "=" * 70)
     print("DONE — open vis/index.html in a browser to explore")
