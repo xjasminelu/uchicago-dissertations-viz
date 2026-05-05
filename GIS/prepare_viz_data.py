@@ -40,6 +40,7 @@ IN_FOOTPRINT   = ROOT / "uchicago-property-footprint-2-28-25.geojson"
 OUT_JS         = VIS_DIR / "vis_data.js"
 OUT_WORLD_JS   = VIS_DIR / "world_data.js"
 OUT_DISS_INDEX = VIS_DIR / "diss_index.js"
+OUT_DIS_FULL = VIS_DIR / "diss_full.js"
 WORLD_CACHE    = VIS_DIR / "world.geojson"
 
 CAMPUS_CENTER  = (41.7890, -87.5993)   # center of main quad
@@ -1621,6 +1622,64 @@ def build_diss_index(rows):
 
     return {"byBuilding": dict(by_building), "byCountry": dict(by_country)}
 
+def write_diss_full(rows):
+    for row in rows:
+        dept = row.get("dept_raw", "").strip()
+        print(row)
+        input()
+        date = row.get("Date", "") or ""
+        try:
+            year = int(date[:4])
+        except (ValueError, TypeError):
+            year = None
+
+        title   = (row.get("Title", "") or "").strip()[:140]
+        author  = _first_item(row.get("Authors", "") or "")
+        advisor = _first_item(row.get("Advisors", "") or "")
+        goid    = row.get("GOID", "")
+
+        entry = {
+            "t": title,
+            "y": year or "",
+            "d": dept if dept not in ("UNKNOWN", "") else "",
+            "a": author,
+            "v": advisor,
+            "g": goid,
+        }
+
+        # ── Building index ──────────────────────────────────────────────────
+        if dept and dept != "UNKNOWN" and year:
+            bldg = get_historical_building(dept, year)
+            if not bldg and row.get("has_geometry") == "True":
+                bldg = row.get("building_name", "").strip()
+            if bldg:
+                by_building[bldg].append(entry)
+
+        # ── Country/geo index ───────────────────────────────────────────────
+        ge_raw = (row.get("geo_entities", "") or "").strip()
+        raw_ents = [e.strip() for e in ge_raw.split(";") if e.strip()] if ge_raw else []
+        if not raw_ents:
+            pg = (row.get("primary_geo", "") or "").strip()
+            if pg:
+                raw_ents = [pg]
+
+        seen: set = set()
+        for ent in raw_ents:
+            country = normalize_country(ent)
+            if country and country not in seen:
+                seen.add(country)
+                by_country[country].append(entry)
+
+    # Sort each list: most recent first
+    for lst in list(by_building.values()) + list(by_country.values()):
+        lst.sort(key=lambda x: -(x["y"] or 0))
+
+    total_bldg = sum(len(v) for v in by_building.values())
+    total_geo  = sum(len(v) for v in by_country.values())
+    print(f"  Buildings indexed: {len(by_building)}, entries: {total_bldg:,}")
+    print(f"  Countries indexed: {len(by_country)}, entries: {total_geo:,}")
+
+    return {"byDivision": dict(by_building), "byAdvisor": dict(by_advisor)}
 
 def write_diss_index(diss_index):
     js_str = json.dumps(diss_index, separators=(",", ":"))
@@ -1711,6 +1770,7 @@ def run():
     diss_index = build_diss_index(rows)
     write_diss_index(diss_index)
     build_world_js()
+    write_diss_full(rows)
 
     print("\n" + "=" * 70)
     print("DONE — open vis/index.html in a browser to explore")
