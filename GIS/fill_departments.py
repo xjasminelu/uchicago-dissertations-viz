@@ -60,6 +60,8 @@ HATHI_CSV         = ROOT / "hathi_1893-1931.csv"
 OUT_OVERRIDES_JSON = GIS_OUT / "dept_overrides.json"
 OUT_LOG            = GIS_OUT / "fill_departments_log.txt"
 
+OUT_DIVISION_OVERRIDES_JSON = GIS_OUT / "div_overrides.json"
+
 
 # ---------------------------------------------------------------------------
 # Title normalisation
@@ -105,7 +107,9 @@ def load_convocation():
             ws = ET.parse(f)
 
     exact, short = {}, {}
+    exact_divs, short_divs = {}, {}
     total = skipped = 0
+
 
     for row_el in ws.findall(f".//{{{ns}}}row"):
         cells = row_el.findall(f"{{{ns}}}c")
@@ -116,8 +120,13 @@ def load_convocation():
         year_raw = get(3).strip()
         # Row width varies: 9-col rows have dept at col8, 10-col rows at col9.
         # Use last column as dept, second-to-last as division fallback.
-        dept     = get(n - 1).strip()
+        
         division = get(n - 2).strip()
+        dept     = get(n - 1).strip()
+
+        if len(division) > 0:
+            if division[0] == '[':
+                division = get(n-1).strip()
 
         try:
             year = int(year_raw)
@@ -126,6 +135,8 @@ def load_convocation():
             continue
 
         raw = (dept or division).strip()   # prefer dept col, fall back to division
+        raw_divs = division.strip()
+
         if not raw:
             skipped += 1
             continue
@@ -133,12 +144,14 @@ def load_convocation():
         ek, sk = make_keys(title, year)
         if ek and ek not in exact:
             exact[ek] = raw
+            exact_divs[ek] = raw_divs
         if sk and sk not in short:
             short[sk] = raw
+            short_divs[sk] = raw_divs
         total += 1
 
     print(f"  {total:,} rows loaded  |  exact keys: {len(exact):,}  |  skipped: {skipped}")
-    return exact, short
+    return exact, short, exact_divs, short_divs
 
 
 # ---------------------------------------------------------------------------
@@ -182,6 +195,7 @@ def load_hathi():
     """
     print("[HATHI] Loading hathi_1893-1931.csv...")
     exact, short = {}, {}
+    exact_divs, short_divs = {}, {}
     by_author_year = defaultdict(list)
     total = skipped = 0
 
@@ -200,6 +214,7 @@ def load_hathi():
                 continue
 
             raw = (dept or division).strip()
+            r_div = division.strip()
             if not raw:
                 skipped += 1
                 continue
@@ -208,8 +223,10 @@ def load_hathi():
                 ek, sk = make_keys(title, year)
                 if ek and ek not in exact:
                     exact[ek] = raw
+                    exact_divs[ek] = r_div
                 if sk and sk not in short:
                     short[sk] = raw
+                    short_divs[sk] = r_div
 
             # Author+year lookup — keyed by (last_name_upper, year)
             last = hathi_last_name(name)
@@ -220,7 +237,7 @@ def load_hathi():
 
     print(f"  {total:,} rows loaded  |  title keys: {len(exact):,}  |"
           f"  author+year keys: {len(by_author_year):,}  |  skipped: {skipped}")
-    return exact, short, by_author_year
+    return exact, short, exact_divs, short_divs, by_author_year
 
 
 # ---------------------------------------------------------------------------
@@ -232,8 +249,8 @@ def run():
     print("UChicago Dissertation Pipeline — Step 0: Fill Departments")
     print("=" * 70)
 
-    conv_exact, conv_short = load_convocation()
-    hath_exact, hath_short, hath_author_yr = load_hathi()
+    conv_exact, conv_short, conv_e_divs, conv_s_divs = load_convocation()
+    hath_exact, hath_short, hath_e_divs, hath_s_divs, hath_author_yr = load_hathi()
 
     print(f"\n[BASE] Reading {DISSERTATIONS_CSV.name}...")
     with open(DISSERTATIONS_CSV, newline="", encoding="utf-8") as f:
@@ -245,6 +262,7 @@ def run():
     print(f"  Empty (to fill):         {len(rows) - already_filled:,}")
 
     overrides = {}
+    overrides_divs = {}
     stats = defaultdict(int)
     match_detail = defaultdict(int)
 
@@ -262,21 +280,23 @@ def run():
             continue
 
         ek, sk = make_keys(title, yr)
-        dept = source = None
+        dept = divs = source = None
 
         # --- convocation (1932–2009) ---
         if 1932 <= yr <= 2009:
             if ek and ek in conv_exact:
-                dept, source = conv_exact[ek], "conv_exact"
+                dept, divs, source = conv_exact[ek], conv_e_divs[ek], "conv_exact"
             elif sk and sk in conv_short:
-                dept, source = conv_short[sk], "conv_short"
+                dept, divs, source = conv_short[sk], conv_s_divs[sk], "conv_short"
 
         # --- hathi (1893–1931): title match first, author+year fallback ---
         elif 1893 <= yr <= 1931:
             if ek and ek in hath_exact:
-                dept, source = hath_exact[ek], "hath_exact"
+                dept, divs, source = hath_exact[ek], hath_e_divs[ek], "hath_exact"
+
             elif sk and sk in hath_short:
-                dept, source = hath_short[sk], "hath_short"
+                dept, divs, source = hath_short[sk], hath_s_divs[sk], "hath_short"
+                
             else:
                 # Author+year fallback: extract last name from ProQuest Authors field
                 # and look up in hathi. Only accept when exactly one candidate exists
@@ -290,9 +310,11 @@ def run():
 
         if dept and goid and not dept.startswith("['") and not dept.startswith('["'):
             overrides[goid] = dept
+            overrides_divs[goid] = divs
             match_detail[source] += 1
             stats["filled"] += 1
         else:
+            overrides_divs[goid] = divs
             stats["unknown"] += 1
 
     # -----------------------------------------------------------------------
@@ -300,6 +322,9 @@ def run():
     # -----------------------------------------------------------------------
     with open(OUT_OVERRIDES_JSON, "w", encoding="utf-8") as f:
         json.dump(overrides, f, indent=2, sort_keys=True)
+
+    with open(OUT_DIVISION_OVERRIDES_JSON, "w", encoding="utf-8") as f:
+        json.dump(overrides_divs, f, indent=2, sort_keys=True)
 
     total = len(rows)
     with_dept = stats["proquest"] + stats["filled"]
