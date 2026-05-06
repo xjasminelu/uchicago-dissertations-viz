@@ -530,7 +530,7 @@
     <button class="tab-btn"        onclick="switchTab('ring')">Keyword Similarity</button>
     <button class="tab-btn"        onclick="switchTab('network')">Network Analysis</button>
     <button class="tab-btn"        onclick="switchTab('depts')">Dept Histories</button>
-    <button class="tab-btn placeholder">Advisors &amp; Committee</button>
+    <button class="tab-btn" data-tab="advisors">Advisors &amp; Committee</button>
     <button class="tab-btn"        onclick="switchTab('explorer')">Dissertation Explorer</button>
     <button class="tab-btn placeholder">ORCID &amp; Post-Graduation</button>
     <button class="tab-btn"        onclick="switchTab('download')" style="margin-left:auto;">⬇ Download Data</button>
@@ -1276,7 +1276,7 @@
     </div>
 
   </div>
-  
+
   <!-- ================================================================ -->
   <!-- TAB 8 — Dissertation Explorer (React App)                        -->
   <!-- ================================================================ -->
@@ -1556,7 +1556,7 @@ function escHtml(s) {
 // Tab switching
 // ==========================================================================
 
-const TABS = ["about", "campus", "global", "ring", "depts", "explorer", "download"];
+const TABS = ["about", "campus", "global", "ring", "depts", "advisors", "explorer", "download"];
 // placeholder tabs (network, advisors, explorer, orcid) have no panel — skip in switchTab
 let tabInited = {};
 
