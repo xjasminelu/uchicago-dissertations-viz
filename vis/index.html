@@ -3659,7 +3659,7 @@ function initNetworkAnalysis() {
     .join("line")
     .attr("source", d => d.source.id)
     .attr("target", d => d.target.id)
-    .attr("stroke-width", 1);
+    .attr("stroke-width", 3);
 
     const node = nw_svg.append("g")
       .attr("stroke", "#fff")
@@ -3670,9 +3670,7 @@ function initNetworkAnalysis() {
       .join("circle")
       .attr("count", d => d.radius)
       .attr("r", d => Math.sqrt(d.radius)/2)
-      .attr("fill", d => color(d.group));
-
-    
+      .attr("fill", d => getNodeColor(d.group, d.id));
 
   var mouseover = function(d) {
     tooltip
@@ -3707,9 +3705,55 @@ function initNetworkAnalysis() {
     console.log(entry)
   }
 
-  var onclick = function(d) {
+  var mouseoverLink = function(d) {
+    d3.select(this).style("stroke", "blue")
+    tooltip
+      .style("opacity", 1)
+  }
 
+  var mousemoveLink = function(d) {
+    tooltip
+      .html(
+        `<strong>${d.target.__data__.source.id} > ${d.target.__data__.target.id}</strong><br/>` +
+        `<em style="font-size:.7rem;color:#2245b5">Click to explore</em>`)
+      .style("left", (d.layerX+30) + "px")
+      .style("top", d.layerY + "px")
+  }
+
+  var mouseoutLink = function(d) {
+    tooltip
+      .style("opacity", 0)
+    d3.select(this).style("stroke", "#999")
+  }
+
+  var clickLink = function(d) {
+    link_data = d.target.__data__
+    console.log(link_data)
+
+
+    nw_svg.selectAll("line")
+      .style("stroke", "#999")
+
+    nw_svg.selectAll("circle")
+      .style("stroke", "white")
+
+    nw_svg.selectAll(this).style("stroke", "blue")
+
+    nw_svg.selectAll("circle")
+      .filter(function(x, i) {
+        console.log(x);
+        return (x.id === link_data.source.id) || (x.id === link_data.target.id);
+       })
+      .style("stroke", "black")
+  }
+
+  var changeGraph = function(d) {
+    console.log(d)
+  }
+
+  var onclick = function(d) {
     node_data = d.target.__data__
+
 
     thisNode = d.target.__data__; // where nodeObject is the javascript object for the node, it's probably called "d" in your function.
 
@@ -3732,7 +3776,7 @@ function initNetworkAnalysis() {
         if (depts[dept] != 'count') depts_html += `<a href="#" onclick="" color:#2d7a4f;font-size:.72rem;margin-left:4px;" <strong>${depts[dept]} → </strong> </a> <br /> `
       }
       d3.select("#network-card-content").html(`<h3>${d.target.__data__.id} </h3>` +
-      `<a href="#" onclick="" style="color:#2d7a4f;font-size:.72rem;margin-left:4px;">Explode graph of  ${d.target.__data__.id} →</a> <br />` +
+      `<a href="#" onclick="changeGraph" data=${d.target.__data__.id} style="color:#2d7a4f;font-size:.72rem;margin-left:4px;">Explode graph of ${d.target.__data__.id} →</a> <br />` +
     `${count} total dissertations <br/>` + depts_html)
     }
     else if (d.target.__data__.group == 'department'){
@@ -3744,15 +3788,38 @@ function initNetworkAnalysis() {
         if (entries[entry] != 'count') entries_html += `<a href="#" onclick="clickEntry(${entries[entry].g})" color:#2d7a4f;font-size:.72rem;margin-left:4px;" <strong>${entries[entry].t} → </strong> </a> <br /> `
       }
       d3.select("#network-card-content").html(`<h3>${d.target.__data__.id} </h3>` +
-        `<a href="#" onclick="" style="color:#2d7a4f;font-size:.72rem;margin-left:4px;">Explode graph of  ${d.target.__data__.id} →</a> <br />` +
+        `<a href="#" class="changeGraphBtn" style="color:#2d7a4f;font-size:.72rem;margin-left:4px;">Explode graph of  ${d.target.__data__.id} →</a> <br />` +
         `${count} total dissertations <br/>` + entries_html);
       }
 
+      
+
     }
-    
+  
 
   function getNodeColor(group, id){
-    return 'red';
+    const DIV_COLORS = {
+      "Physical Sciences Division":          "#2d7a4f",
+      "Biological Sciences Division":          "#c46800",
+      "Division of Humanities":   "#8B4513",
+      "Division of Arts and Humanities":   "#8B4513",
+      "Social Sciences Division":          "#2e6b9e",
+      "Divinity":     "#a0522d",
+      "Professional": "#666666",
+    };
+
+    if (group == 'division'){
+      if (Object.keys(DIV_COLORS).includes(id)){
+        return DIV_COLORS[id];
+      }
+      else{
+        return "#666666"
+      }
+      
+    }
+    else {
+      return "#c25555"
+    }
   }
 
 
@@ -3772,6 +3839,7 @@ function initNetworkAnalysis() {
         return '12px'
       }
     })
+    .style('text-shadow', '0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff')
     .attr("group", function(d) {
       return ''})
     .text(function(d) { 
@@ -3789,6 +3857,11 @@ function initNetworkAnalysis() {
         .on("drag", dragged)
         .on("end", dragended));
 
+
+  link.on("mouseover", mouseoverLink)
+    .on("mousemove", mousemoveLink)
+    .on("mouseleave", mouseoutLink)
+    .on("click", clickLink);
 
   node.on("mouseover", mouseover)
     .on("mousemove", mousemove)
