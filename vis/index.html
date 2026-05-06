@@ -1549,6 +1549,7 @@ function switchTab(name) {
     if (name === "global")          initGlobalMap();
     if (name === "ring")            initRingSpecies();
     if (name === "depts")           initDeptHistory();
+    if (name === "network")         initNetworkAnalysis();
   }
   // Invalidate Leaflet maps on tab show (fixes tile rendering)
   if (name === "campus") campusMap && campusMap.invalidateSize();
@@ -3583,7 +3584,6 @@ function initNetworkAnalysis() {
   
   
   data = {nodes: Array(), links: Array()};
-
   for (const div in DISS_FULL['byDivision']){
     data.nodes.push({id: div, group: "division", radius: DISS_FULL['byDivision'][div].count})
     for (const dept in DISS_FULL['byDivision'][div]){
