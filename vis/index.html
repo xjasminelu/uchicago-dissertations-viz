@@ -1166,7 +1166,7 @@
           <div style="font-size:.72rem;color:#444;line-height:1.65;margin-top:6px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
             <div style="background:#fff;border-left:3px solid #800000;padding:8px 10px;">
               <strong style="color:#800000;display:block;margin-bottom:3px;">What the nodes and links mean</strong>
-              Each node segment is a dissertation which you can click to explore further or a department which you can zoom into.
+              Each node is a school/division or department which you can click to explore further. Departments are normalized to their modern day counterpart departments (see tab <a href="" onclick="switchTabTo('depts'); return false;">department histories</a>, but you can click to explore more to see the history of their naming conventions. 
             </div>
             <div style="background:#fff;border-left:3px solid #2e6b9e;padding:8px 10px;">
               <strong style="color:#2e6b9e;display:block;margin-bottom:3px;">What the cards include</strong>
@@ -3635,8 +3635,8 @@ function initNetworkAnalysis() {
   const nodes = data.nodes.map(d => ({...d}));
   const links = data.links.map(d => ({...d}));
 
-  width = 800;
-  height = 500;
+  width = 900;
+  height = 700;
 
   const color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -3748,13 +3748,15 @@ function initNetworkAnalysis() {
   var mouseoutLink = function(d) {
     tooltip
       .style("opacity", 0)
-    d3.select(this).style("stroke", "#999")
+
+    if (d.target.getAttribute("class") != 'selected-link') d3.select(this).style("stroke", "#999");
   }
 
   var clickLink = function(d) {
     link_data = d.target.__data__
-    console.log(link_data)
 
+
+    //stylistically render selection
 
     nw_svg.selectAll("line")
       .style("stroke", "#999")
@@ -3762,14 +3764,45 @@ function initNetworkAnalysis() {
     nw_svg.selectAll("circle")
       .style("stroke", "white")
 
-    nw_svg.selectAll(this).style("stroke", "blue")
+    //remove all other "selected-links"
+
+    nw_svg.selectAll("line")
+      .attr("class", "")
+
+    nw_svg.selectAll("line")
+      .filter(function(x, i) {
+        return (x.source.id === link_data.source.id) & (x.target.id === link_data.target.id);
+      })
+      .style("stroke", "blue")
+      .attr("class", "selected-link")
+
 
     nw_svg.selectAll("circle")
       .filter(function(x, i) {
-        console.log(x);
         return (x.id === link_data.source.id) || (x.id === link_data.target.id);
        })
       .style("stroke", "black")
+
+
+    // UPDATE RIGHT SIDE CARD
+
+    dept_entries = DISS_FULL['byDepartment'][link_data.target.id].entries;
+    link_entries = Array();
+    entries_html = ``;
+
+    for (entry in dept_entries){
+      if (dept_entries[entry].div == link_data.source.id) {
+        link_entries.push(dept_entries[entry]);
+        entries_html += `<a href="#" onclick="clickEntry(${dept_entries[entry].g})" color:#2d7a4f;font-size:.72rem;margin-left:4px;" <strong>${dept_entries[entry].t} → </strong> </a> <br /> `
+      }
+    }
+
+
+
+    d3.select("#network-card-content").html(`<h3>${d.target.__data__.source.id} > ${d.target.__data__.target.id}</h3>` +
+      `<a href="#" class="changeGraphBtn" style="color:#2d7a4f;font-size:.72rem;margin-left:4px;">Explode graph of  ${d.target.__data__.source.id} > ${d.target.__data__.target.id} →</a> <br />` +
+      `${link_entries.length} total dissertations <br/>` + entries_html);
+
   }
 
   var changeGraph = function(d) {
@@ -3777,11 +3810,8 @@ function initNetworkAnalysis() {
   }
 
   var onclick = function(d) {
-    node_data = d.target.__data__
 
-
-    thisNode = d.target.__data__; // where nodeObject is the javascript object for the node, it's probably called "d" in your function.
-
+    thisNode = d.target.__data__;
     nw_svg.selectAll("line")
       .style("stroke", "#999")
 
